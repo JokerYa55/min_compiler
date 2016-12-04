@@ -25,3 +25,17 @@
 14:12:36,935 ERROR main :main:44 - java.lang.NullPointerException
 14:16:43,207 ERROR main :main:44 - java.lang.RuntimeException: Uncompilable source code - illegal start of expression
 14:17:53,056 ERROR main :main:44 - java.lang.RuntimeException: Uncompilable source code - illegal start of expression
+20:29:17,564 ERROR main :main:52 - java.lang.NullPointerException
+20:29:32,650 ERROR main :main:52 - java.lang.NullPointerException
+20:56:53,207 ERROR main :main:52 - java.lang.NullPointerException
+20:57:39,607 ERROR main :main:52 - java.lang.NullPointerException
+21:00:39,828 ERROR main :main:52 - java.lang.NullPointerException
+21:02:29,951 ERROR main :main:52 - java.lang.NullPointerException
+21:02:40,389 ERROR main :main:52 - java.lang.NullPointerException
+21:02:45,465 ERROR main :main:52 - java.lang.NullPointerException
+21:31:30,789 ERROR main :main:52 - java.lang.NullPointerException
+21:48:58,904 ERROR main :main:52 - java.lang.NullPointerException
+21:58:43,173 ERROR main :main:53 - java.lang.NullPointerException
+22:01:19,650 ERROR main :main:53 - java.lang.NullPointerException
+22:02:19,323 ERROR main :main:53 - java.lang.NullPointerException
+22:05:00,982 ERROR main :main:53 - java.lang.NullPointerException

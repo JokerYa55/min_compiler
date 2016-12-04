@@ -24,7 +24,7 @@ public class lexNode {
         return nToen;
     }
 
-    public void setnToen(token nToen) {
+    public void setnToken(token nToen) {
         this.nToen = nToen;
     }
 

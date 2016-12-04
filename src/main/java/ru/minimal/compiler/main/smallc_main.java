@@ -9,6 +9,7 @@ import java.io.FileReader;
 import org.apache.log4j.Logger;
 import ru.minimal.compiler.comiler.compiller_c;
 import ru.minimal.compiler.comiler.lexTree;
+import ru.minimal.compiler.comiler.programStract;
 import ru.minimal.compiler.lexer.lexer;
 import ru.minimal.compiler.runtime.run;
 
@@ -21,7 +22,7 @@ public class smallc_main {
     /**
      * @param args the command line arguments
      */
-    static Logger log = Logger.getLogger("");
+    static Logger log = Logger.getLogger(smallc_main.class);
 
     public static void main(String[] args) {
         // TODO code application logic here
@@ -29,20 +30,18 @@ public class smallc_main {
         // TODO code application logic here
         log.debug("Запуск компиятора");
 
-        try (FileReader fin = new FileReader("/home/vasl/log/program.c--")) {
+        try (FileReader fin = new FileReader(args[0])) {
             int c;
             lexer lex = new lexer(fin);
             compiller_c comp = new compiller_c();
-            lexTree tree = comp.genlexTree(lex.getTokenList());
+            programStract tree = comp.genlexTree(lex.getTokenList());
             System.out.println(tree.toString());
-            comp.genASText();
+            comp.genASText(args[1]);
 
             // Запускаем программу 
-            run runnable = new run("/home/vasl/log/program.asm--");
-
-            runnable.getVarTable().forEach((t, u) -> {
-                System.out.println("t = " + t + "\tu = " + u);
-            });
+            run runnable = new run(args[1]);
+            
+            System.out.println(runnable.getVariable());
 
             /*while ((c = fin.read())!=-1)
             {
