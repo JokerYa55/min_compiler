@@ -8,8 +8,10 @@ package ru.minimal.compiler.main;
 import java.io.FileReader;
 import org.apache.log4j.Logger;
 import ru.minimal.compiler.comiler.compiller_c;
+import ru.minimal.compiler.comiler.compiller_exp;
 import ru.minimal.compiler.comiler.lexTree;
 import ru.minimal.compiler.comiler.programStract;
+import ru.minimal.compiler.interfaces.compilerInterface;
 import ru.minimal.compiler.lexer.lexer;
 import ru.minimal.compiler.runtime.run;
 
@@ -33,15 +35,17 @@ public class smallc_main {
         try (FileReader fin = new FileReader(args[0])) {
             int c;
             lexer lex = new lexer(fin);
-            compiller_c comp = new compiller_c();
+            compilerInterface comp = new compiller_exp();
+            
+            //compiller_c comp = new compiller_c();
             programStract tree = comp.genlexTree(lex.getTokenList());
-            System.out.println(tree.toString());
+            /*System.out.println(tree.toString());
             comp.genASText(args[1]);
 
             // Запускаем программу 
             run runnable = new run(args[1]);
             
-            System.out.println(runnable.getVariable());
+            System.out.println(runnable.getVariable());*/
 
             /*while ((c = fin.read())!=-1)
             {
