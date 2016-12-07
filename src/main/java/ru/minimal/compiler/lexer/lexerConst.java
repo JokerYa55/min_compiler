@@ -18,4 +18,19 @@ public class lexerConst {
     public enum expTypeEnum {
         OPER, BLOCK
     }
+
+    public static boolean isOper(token tok) {
+        boolean flag = false;
+        switch (tok.getSym()) {
+            case EQUAL:
+                flag = true;
+            case MINUS:
+                flag = true;
+            case PLUS:
+                flag = true;
+            default:
+                break;
+        }
+        return flag;
+    }
 }

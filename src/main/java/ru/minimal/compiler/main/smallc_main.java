@@ -39,8 +39,8 @@ public class smallc_main {
             
             //compiller_c comp = new compiller_c();
             programStract tree = comp.genlexTree(lex.getTokenList());
-            /*System.out.println(tree.toString());
-            comp.genASText(args[1]);
+            System.out.println(tree.toString());
+            /*comp.genASText(args[1]);
 
             // Запускаем программу 
             run runnable = new run(args[1]);

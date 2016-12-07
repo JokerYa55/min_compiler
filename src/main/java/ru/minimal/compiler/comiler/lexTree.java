@@ -13,7 +13,7 @@ import ru.minimal.compiler.lexer.token;
  *
  * @author vasl
  */
-public class lexTree implements expInterface{
+public class lexTree implements expInterface {
 
     private lexNode rootNode;
     private lexerConst.expTypeEnum expType;
@@ -26,6 +26,10 @@ public class lexTree implements expInterface{
 
     public lexTree() {
 
+    }
+
+    public lexTree(lexNode rNode) {
+        this.rootNode = rNode;
     }
 
     public lexNode addNode(lexNode parent, token current) {

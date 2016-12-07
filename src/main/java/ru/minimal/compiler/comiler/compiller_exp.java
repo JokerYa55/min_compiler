@@ -7,6 +7,7 @@ package ru.minimal.compiler.comiler;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -33,6 +34,8 @@ public class compiller_exp implements compilerInterface {
     private Stack<programBlock> blockStack = new Stack();
     // Стек для скобок
     private Stack<String> stackSc = new Stack<>();
+    // Стек для выражений
+    private StackExp stackExp = new StackExp();
     /*
         programStruct   - структура программы. состоит из блоков
         programBlock    - блок операторов объедененных логически. Всегда есть 
@@ -95,117 +98,13 @@ public class compiller_exp implements compilerInterface {
                         exp.add(listToken.get(i));
                         if (listToken.get(i).getSym() == lexerConst.tokenEnum.SEMICOLON) {
                             log.debug("Отрабатываем ;");
-                            getExp(exp);
+                            lexNode cNode = getExp(exp.subList(0, exp.size() - 1), null);
+                            lexTree lTree = new lexTree(cNode);
+                            this.currentProgramBlock.addOper(lTree);
                             exp.clear();
                         }
                     }
-//                    for (int i = 1; i < listToken.size(); i++) {
-//                        log.debug("symvol = " + listToken.get(i));
-//
-//                        // обрабатываем новый блок
-//                        
-//
-//                        
-//
-//                        // Обрабатывае цифру
-//                        if (listToken.get(i).getSym() == lexerConst.tokenEnum.NUM) {
-//                            log.debug("Отрабатываем NUM");
-//                            lexNode node = new lexNode();
-//                            node.setnToken(listToken.get(i));
-//                            stack.push(node);
-//                            log.debug("stack = " + stack.size());
-//                        }
-//
-//                        // Обрабатываем конец операнда ;
-//                        if (listToken.get(i).getSym() == lexerConst.tokenEnum.SEMICOLON) {
-//                            log.debug("Отрабатываем ;");
-//
-//                            // обработка одиночного оператора типа b=7;
-//                            if (this.stack.size() == 1) {
-//                                if (this.currentNode.getrNode() == null) {
-//                                    this.currentNode.setrNode(stack.pop());
-//                                    this.currentNode.getrNode().setLevel(this.currentNode.getLevel() + 1);
-//                                } else {
-//                                    this.currentNode.setlNode(stack.pop());
-//                                    this.currentNode.getlNode().setLevel(this.currentNode.getLevel() + 1);
-//                                }
-//                                this.currentNode = this.tree.getRootNode();
-//                                this.tree.setType(lexerConst.expTypeEnum.OPER);
-//                                this.currentProgramBlock.addOper(this.tree);
-//                                this.tree = null;
-//                                log.debug("stack = " + stack.size());
-//                            } else {
-//                                // Обработка опертора типа b=5+7;
-//                                this.currentNode.setrNode(stack.pop());
-//                                this.currentNode.getrNode().setLevel(this.currentNode.getLevel() + 1);
-//                                //this.currentNode = this.tree.getRootNode();
-//
-//                                this.currentNode.setlNode(stack.pop());
-//                                this.currentNode.getlNode().setLevel(this.currentNode.getLevel() + 1);
-//
-//                                this.currentNode = this.tree.getRootNode();
-//                                this.currentProgramBlock.addOper(this.tree);
-//                                this.tree = null;
-//                                log.debug("stack = " + stack.size());
-//                            }
-//                            //currentToken = null;
-//                        }
-//
-//                        // Обрабатываем переменную
-//                        if (listToken.get(i).getSym() == lexerConst.tokenEnum.ID) // Если текущий токен идентификатор
-//                        {
-//                            // если нет текущей операции то ддобавяе в стек
-//                            log.debug("Отрабатываем ID блок : " + this.currentProgramBlock.getBlockName());
-//                            lexNode node = new lexNode();
-//                            // вносим переменную вместе с именем блока
-//                            listToken.get(i).setVal(/*this.currentProgramBlock.getBlockName() + "." + */listToken.get(i).getVal());
-//                            node.setnToken(listToken.get(i));
-//                            stack.push(node);
-//                            log.debug("stack = " + stack.size());
-//                            //currentToken = listToken.get(i);
-//                            /* } else {
-//                        System.out.println("Отрабатываем ID1");
-//                        //Если есть текущая операция то добавляе узел справа
-//                        this.currentNode = this.tree.addNode(currentNode, listToken.get(i));
-//                        System.out.println("stack = " + stack.size());
-//                    }*/
-//                        }
-//
-//                        //Обрабатываем операции
-//                        switch (listToken.get(i).getSym()) {
-//                            case EQUAL:
-//                                log.debug("Отрабатываем =");
-//                                if (tree == null) {
-//                                    this.tree = new lexTree();
-//                                }
-//                                this.currentNode = this.tree.addNode(null, listToken.get(i));
-//                                this.currentNode.setlNode(stack.pop());
-//                                this.currentNode.getlNode().setLevel(this.currentNode.getLevel() + 1);
-//                                currentToken = listToken.get(i);
-//                                log.debug("stack = " + stack.size());
-//                                break;
-//                            case IF:
-//                                this.currentNode = this.tree.addNode(currentNode, listToken.get(i));
-//                                break;
-//                            case PLUS:
-//                                this.currentNode = this.tree.addNode(currentNode, listToken.get(i));
-//                                this.currentNode.setlNode(stack.pop());
-//                                this.currentNode.getlNode().setLevel(this.currentNode.getLevel() + 1);
-//                                currentToken = listToken.get(i);
-//                                log.debug("stack = " + stack.size());
-//                                break;
-//                            case MINUS:
-//                                this.currentNode = this.tree.addNode(currentNode, listToken.get(i));
-//                                this.currentNode.setlNode(stack.pop());
-//                                this.currentNode.getlNode().setLevel(this.currentNode.getLevel() + 1);
-//                                currentToken = listToken.get(i);
-//                                log.debug("stack = " + stack.size());
-//                                break;
-//                            default:
-//                                //System.out.println("Не операция : " + listToken.get(i));
-//                                break;
-//                        }
-//                    }
+
                 }
             } else {
                 log.error("Ошибка компилции");
@@ -218,10 +117,45 @@ public class compiller_exp implements compilerInterface {
     }
 
     // Разбирает выражения
-    private lexTree getExp(List<token> exp) {
-        lexTree localTree = null;
+    private lexNode getExp(List<token> exp, lexNode parentNode) {
         System.out.println("exp = " + exp);
-        return localTree;
+        lexNode localNode = new lexNode();
+        int len = exp.size() - 1;
+        if (len == 0) {
+            // если мы получаем переменную либо число создаем узел
+            localNode.setnToken(exp.get(len));
+            localNode.setLevel(parentNode.getLevel() + 1);
+        } else {
+            // Левое выражение
+            List<token> lExp = new ArrayList<>();
+            // Правое выражение
+            List<token> rExp = new ArrayList<>();
+            int i = 0;
+            boolean flag = true;
+            while (flag) {
+                if (lexerConst.isOper(exp.get(i))) {
+                    flag = false;
+                    // Если операция получаем левое и правое выражения и обрабатываем их
+                    lExp = exp.subList(0, i);
+                    rExp = exp.subList(i + 1, len + 1);
+
+                    // Вычисляем уровень 
+                    long nLevel = 0;
+                    if (parentNode != null) {
+                        nLevel = parentNode.getLevel() + 1;
+                    }
+                    localNode.setLevel(nLevel);
+                    localNode.setnToken(exp.get(i));
+
+                    // Вычисляем левое и правое выражения
+                    localNode.setlNode(getExp(lExp, localNode));
+                    localNode.setrNode(getExp(rExp, localNode));
+                } else {
+                    i++;
+                }
+            }
+        }
+        return localNode;
     }
 
     private void getNextNode(lexNode parentNode, FileWriter out) throws IOException {
