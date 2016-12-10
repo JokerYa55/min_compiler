@@ -287,6 +287,12 @@ public class compiller_c implements compilerInterface{
         }*/
     }
 
+    /**
+     *
+     * @param outFile
+     * @throws IOException
+     */
+    @Override
     public void genASText(String outFile) throws IOException {
 
         //lexNode currentNode = this.tree.getRootNode();

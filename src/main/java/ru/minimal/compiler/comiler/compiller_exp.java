@@ -116,9 +116,32 @@ public class compiller_exp implements compilerInterface {
         return this.ps;
     }
 
+    // Обрабатываем скобки в выражениях. Возвращает позицию закрывающей скобки для выражения
+    private int getParEndPost(List<token> exp) {
+        int res = 0;
+        // Стек для скобок
+        Stack<token> st = new Stack<>();
+        int i = 0;
+        do {
+            if (exp.get(i).getSym() == lexerConst.tokenEnum.LPAR) {
+                st.push(exp.get(i));
+            }
+
+            if (exp.get(i).getSym() == lexerConst.tokenEnum.RPAR) {
+                st.pop();
+            }
+            res = i;
+            i++;
+        } while (st.size() > 0);
+
+        return res;
+    }
+
     // Разбирает выражения
     private lexNode getExp(List<token> exp, lexNode parentNode) {
-        System.out.println("exp = " + exp);
+        //int b;
+        //int a=(((7+3)+(b+5))+b+(b+7))+b;
+        log.debug("exp = " + exp);
         lexNode localNode = new lexNode();
         int len = exp.size() - 1;
         if (len == 0) {
@@ -126,32 +149,75 @@ public class compiller_exp implements compilerInterface {
             localNode.setnToken(exp.get(len));
             localNode.setLevel(parentNode.getLevel() + 1);
         } else {
+            // Если выражение
             // Левое выражение
             List<token> lExp = new ArrayList<>();
             // Правое выражение
             List<token> rExp = new ArrayList<>();
             int i = 0;
-            boolean flag = true;
-            while (flag) {
-                if (lexerConst.isOper(exp.get(i))) {
-                    flag = false;
-                    // Если операция получаем левое и правое выражения и обрабатываем их
-                    lExp = exp.subList(0, i);
-                    rExp = exp.subList(i + 1, len + 1);
 
-                    // Вычисляем уровень 
-                    long nLevel = 0;
+            if (exp.get(0).getSym() == lexerConst.tokenEnum.LPAR) {
+                // обрабатываем скобку 
+                int p = getParEndPost(exp);
+                if (p < len) {
+                    // Если выражение типа (exp) <oper> exp 
+                    lExp = exp.subList(1, p);
+                    rExp = exp.subList(p + 2, len+1);
                     if (parentNode != null) {
-                        nLevel = parentNode.getLevel() + 1;
+                        localNode.setLevel(parentNode.getLevel() + 1);
+                    } else {
+                        localNode.setLevel(0);
                     }
-                    localNode.setLevel(nLevel);
-                    localNode.setnToken(exp.get(i));
 
+                    localNode.setnToken(exp.get(p + 1));
                     // Вычисляем левое и правое выражения
-                    localNode.setlNode(getExp(lExp, localNode));
-                    localNode.setrNode(getExp(rExp, localNode));
+                    if (lExp != null) {
+                        localNode.setlNode(getExp(lExp, localNode));
+                    }
+                    if (rExp != null) {
+                        localNode.setrNode(getExp(rExp, localNode));
+                    }
+
                 } else {
-                    i++;
+                    // Если выражение (ep)
+                    List<token> expTemp = exp.subList(1, len);
+                    localNode = getExp(expTemp, parentNode);
+                }
+
+            } else {
+                boolean flag = true;
+                while (flag) {
+                    if (lexerConst.isOper(exp.get(i))) {
+                        flag = false;
+                        // Если операция получаем левое и правое выражения и обрабатываем их
+                        log.error("Обработка операции : " + exp.get(i));
+
+                        // Проверяем на скобки
+                        lExp = exp.subList(0, i);
+                        rExp = exp.subList(i + 1, len + 1);
+
+                        // Вычисляем уровень 
+                        long nLevel = 0;
+                        if (parentNode != null) {
+                            nLevel = parentNode.getLevel() + 1;
+                        }
+                        // Устанавливаем уровень
+                        localNode.setLevel(nLevel);
+                        // Устанавливаем значение узла
+                        localNode.setnToken(exp.get(i));
+                        // Устанавливаем тип узла на OPER
+                        //localNode.setType(lexerConst.expTypeEnum.OPER);
+
+                        // Вычисляем левое и правое выражения
+                        if (lExp != null) {
+                            localNode.setlNode(getExp(lExp, localNode));
+                        }
+                        if (rExp != null) {
+                            localNode.setrNode(getExp(rExp, localNode));
+                        }
+                    } else {
+                        i++;
+                    }
                 }
             }
         }
@@ -224,9 +290,22 @@ public class compiller_exp implements compilerInterface {
     }
 
     public void genBlokASMText(programBlock block, FileWriter out) throws IOException {
+        try {
+            log.debug("Обработка блока " + block.getBlockName());
+            // Получаем список операций в блоке 
+            for (expInterface item : block.getOperList()) {
+                log.debug("oper = " + item);
+                getNextNode(((lexTree) item).getRootNode(), out);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    /*public void genBlokASMText(programBlock block, FileWriter out) throws IOException {
         log.debug("Обработка блока " + block.getBlockName());
         for (expInterface item : block.getOperList()) {
-            if (item.getType() == lexerConst.expTypeEnum.OPER) {
+            System.out.println("type = " + item.getType());
+            if (lexerConst.expTypeEnum.OPER == item.getType()) {
                 // обрабатываем операцию
                 log.debug("Обрабатывается операция");
                 log.debug(((lexTree) item).toString());
@@ -239,21 +318,13 @@ public class compiller_exp implements compilerInterface {
                 out.write(((programBlock) item).getBlockName() + ":\n");
                 genBlokASMText(((programBlock) item), out);
             }
-        }
-        /*if (block.getpBlock() != null) {
-            genBlokASMText(block.getpBlock(), out);
-        }*/
-    }
-
+        }       
+    }*/
+    @Override
     public void genASText(String outFile) throws IOException {
-
-        //lexNode currentNode = this.tree.getRootNode();
         // обходим дерево
         try (FileWriter wout = new FileWriter(outFile)) {
-            //Writer wout;
-            /*for (lexTree item : this.ps.getPblock().getOperList()) {
-                getNextNode(item.getRootNode(), wout);
-            }*/
+
             genBlokASMText(this.ps.getPblock(), wout);
         }
     }

@@ -5,9 +5,7 @@
  */
 package ru.minimal.compiler.interfaces;
 
-import java.util.List;
 import ru.minimal.compiler.lexer.lexerConst.expTypeEnum;
-import ru.minimal.compiler.lexer.token;
 
 /**
  *

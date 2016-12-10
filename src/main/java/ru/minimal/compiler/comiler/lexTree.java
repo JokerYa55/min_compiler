@@ -57,7 +57,7 @@ public class lexTree implements expInterface {
     private String nodeToString(lexNode node, String par) {
         boolean flag = false;
         StringBuilder res = new StringBuilder();
-        res.append(par + " -> " + String.format("%" + (node.getnToen().toString().length() + 5 * node.getLevel()) + "s%n", node.getnToen().toString() + " - " + node.getLevel()));
+        res.append(par + "\t-> " + String.format("%" + (node.getnToen().toString().length() + 5 * node.getLevel()) + "s%n", node.getnToen().toString() + " - " + node.getLevel()));
         if (node.getlNode() != null) {
             res.append(nodeToString(node.getlNode(), "left"));
         }

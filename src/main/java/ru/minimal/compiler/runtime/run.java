@@ -40,13 +40,17 @@ public class run implements processorInterfaces {
     @Override
     public void runProc() {
         try {
+            // Инициализируем шаблоны команд для парсинга команд;
             initPattern();
+            // Открываем файл с ASM кодом на исполнение
             this.fr = new BufferedReader(new FileReader(this.fileName));
             String temp = "";
             int i = 0;
+            // Читаем команды и исполняем их
             while ((temp = fr.readLine()) != null) {
                 i++;
                 log.debug(i + ": temp = " + temp);
+
                 if (isPush(temp)) {
                     log.debug("push");
                     String[] operand = temp.split(" ");
@@ -97,14 +101,16 @@ public class run implements processorInterfaces {
                         varTable.put(operand[1].substring(0, operand[1].length() - 1), new Integer(0));
                     }
                 }
-
+                log.info(getStack());
             }
         } catch (Exception e) {
             log.error("Ошибка: " + e.getMessage());
         }
     }
 
+    // Инициализация шаблонов команд
     private void initPattern() {
+        log.debug("initPattern");
         addPattern = Pattern.compile("^add;$");
         subPattern = Pattern.compile("^sub;$");
         popPattern = Pattern.compile("^pop [a-zA-Z]+;$");
@@ -155,38 +161,42 @@ public class run implements processorInterfaces {
         return res;
     }
 
-    public HashMap<String, Integer> getVarTable() {
-        return varTable;
-    }
-
+    // Получение текста программы
     @Override
     public String getProgramText() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    // Получение текущего стека программы
     @Override
     public String getStack() {
         log.debug("getStack()");
-        String res = null;
+        String res = "Состояние стека :\n";
         int i = 0;
         for (Integer itemKey : stack) {
             i++;
-            res = res + i + " : " + itemKey;
+            res = res + i + " : " + itemKey + "\n";
         }
         return res;
     }
 
+    // Получение таблицы переменных программы
     @Override
     public String getVariable() {
         log.debug("getVariable()");
-        String res = null;
+        String res = "Переменные : \n";
         try {
             for (String itemKey : this.getVarTable().keySet()) {
-                res = res + "t = " + itemKey + "\tu = " + this.getVarTable().get(itemKey) + "\n";
+                res = res + itemKey + "\t= " + this.getVarTable().get(itemKey) + "\n";
             }
+            //log.info(res);
         } catch (Exception e) {
             log.error("Ошибка : " + e.getMessage());
         }
         return res;
+    }
+
+    public HashMap<String, Integer> getVarTable() {
+        return varTable;
     }
 }

@@ -5,6 +5,7 @@
  */
 package ru.minimal.compiler.interfaces;
 
+import java.io.IOException;
 import java.util.List;
 import ru.minimal.compiler.comiler.programStract;
 import ru.minimal.compiler.lexer.token;
@@ -16,5 +17,7 @@ import ru.minimal.compiler.lexer.token;
 public interface compilerInterface {
 
     programStract genlexTree(List<token> listToken);
+
+    void genASText(String outFile) throws IOException;
 
 }

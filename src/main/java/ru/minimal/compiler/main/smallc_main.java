@@ -30,29 +30,32 @@ public class smallc_main {
         // TODO code application logic here
         System.out.println("");
         // TODO code application logic here
+        log.info("------------------------------------------------------------------");
         log.debug("Запуск компиятора");
 
         try (FileReader fin = new FileReader(args[0])) {
             int c;
             lexer lex = new lexer(fin);
             compilerInterface comp = new compiller_exp();
-            
+
             //compiller_c comp = new compiller_c();
             programStract tree = comp.genlexTree(lex.getTokenList());
             System.out.println(tree.toString());
-            /*comp.genASText(args[1]);
+            comp.genASText(args[1]);
 
             // Запускаем программу 
             run runnable = new run(args[1]);
-            
-            System.out.println(runnable.getVariable());*/
+
+            log.info(runnable.getVariable());
 
             /*while ((c = fin.read())!=-1)
             {
                 System.out.println("tep = " + (char) c);
             }*/
+            log.info("------------------------------------------------------------------");
         } catch (Exception e) {
             log.error(e);
+            System.out.println("Ошибка : " + e.getMessage());
         }
     }
 
