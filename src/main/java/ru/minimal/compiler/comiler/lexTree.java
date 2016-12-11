@@ -65,6 +65,11 @@ public class lexTree implements expInterface {
         if (node.getrNode() != null) {
             res.append(nodeToString(node.getrNode(), "right"));
         }
+        
+        if (node.getdNode() != null) {
+            res.append(nodeToString(node.getdNode(), "dop"));
+        }
+        
         return res.toString();
     }
 

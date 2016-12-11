@@ -11,7 +11,6 @@ import ru.minimal.compiler.comiler.compiller_exp;
 import ru.minimal.compiler.comiler.programStract;
 import ru.minimal.compiler.interfaces.compilerInterface;
 import ru.minimal.compiler.lexer.lexer;
-import ru.minimal.compiler.runtime.run;
 
 /**
  *
@@ -39,9 +38,9 @@ public class smallc_main {
             comp.genASText(args[1]);
 
             // Запускаем программу 
-            run runnable = new run(args[1]);
+           // run runnable = new run(args[1]);
 
-            log.info(runnable.getVariable());
+            //log.info(runnable.getVariable());
             log.info("------------------------------------------------------------------");
         } catch (Exception e) {
             log.error(e);

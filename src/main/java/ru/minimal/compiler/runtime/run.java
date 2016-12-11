@@ -21,7 +21,13 @@ import ru.minimal.compiler.interfaces.processorInterfaces;
 
 /**
  *
- * @author vasl
+ * @author vasl FETCH x - положить на стек значение переменной x STORE x -
+ * сохранить в переменной x значение с вершины стека PUSH n - положить число n
+ * на вершину стека POP - удалить число с вершины стека ADD - сложить два числа
+ * на вершине стека SUB - вычесть два числа на вершине стека LT - сравнить два
+ * числа с вершины стека (a < b). Результат - 0 или 1 JZ a - если на вершине
+ * стека 0 - перейти к адресу a. JNZ a - если на вершине стека не 0 - перейти к
+ * адресу a. JMP a - перейти к адресу a HALT - завершить работу
  */
 public class run implements processorInterfaces {
 
@@ -36,6 +42,7 @@ public class run implements processorInterfaces {
     private Pattern storePattern;
     private Pattern fetchPattern;
     private Pattern mulPattern;
+    private Pattern lessPattern;
     private final String fileName;        // имя исполняемого файла
     // Служебные регистры
     private int CS = 0; //Сегмент кода указывает на текущую команду
@@ -137,6 +144,15 @@ public class run implements processorInterfaces {
                     } catch (Exception e) {
                         varTable.put(operand[1].substring(0, operand[1].length() - 1), new Long(0));
                     }
+                    
+                    // Обработка команды lt;
+                    if (isLt(temp)) {
+                        log.debug("lt = " + temp);
+                        this.CS++;
+                    } else {
+                        CS++;
+                    }
+
                 }
                 log.info(getStack());
             }
@@ -155,6 +171,7 @@ public class run implements processorInterfaces {
         storePattern = Pattern.compile("^store [0-9a-zA-Z\\._]+;$");
         fetchPattern = Pattern.compile("^fetch [0-9a-zA-Z]+;$");
         mulPattern = Pattern.compile("^mul;$");
+        lessPattern = Pattern.compile("^lt [a-zA-Z]+;$");
     }
 
     private boolean isAdd(String command) {
@@ -167,6 +184,13 @@ public class run implements processorInterfaces {
     private boolean isSub(String command) {
         boolean res = false;
         Matcher m = this.subPattern.matcher(command);
+        res = m.matches();
+        return res;
+    }
+
+    private boolean isLt(String command) {
+        boolean res = false;
+        Matcher m = this.lessPattern.matcher(command);
         res = m.matches();
         return res;
     }

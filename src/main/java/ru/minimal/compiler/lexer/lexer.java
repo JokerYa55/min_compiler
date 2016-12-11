@@ -77,7 +77,7 @@ public class lexer {
         res.setSym(null);
         res.setVal(null);
         while (/*(res.getSym() != null) &&*/(this.currentCh != 65535)) {
-            //System.out.println("current ch = " + (int) this.currentCh);
+            log.debug("ch = " + (int) this.currentCh);
             if (this.currentCh == 0) {
                 res.setSym(tokenEnum.EOF);
                 res.setVal(this.currentCh + "");
@@ -90,7 +90,7 @@ public class lexer {
                 }
                 if (isWord(ident)) {
                     res = new token();
-                    res.setSym(tokenEnum.IF);
+                    res.setSym(words.get(ident));
                     res.setVal(ident);
                     tokenList.add(res);
                     log.debug("word : " + ident);
