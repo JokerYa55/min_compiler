@@ -12,7 +12,7 @@ package ru.minimal.compiler.lexer;
 public class lexerConst {
 
     public enum tokenEnum {
-        NUM, ID, IF, ELSE, WHILE, DO, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, LESS, EQUAL, SEMICOLON, EOF
+        NUM, ID, IF, ELSE, WHILE, DO, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MUL, LESS, EQUAL, SEMICOLON, EOF
     };
 
     public enum expTypeEnum {
@@ -24,10 +24,19 @@ public class lexerConst {
         switch (tok.getSym()) {
             case EQUAL:
                 flag = true;
+                break;
             case MINUS:
                 flag = true;
+                break;
             case PLUS:
                 flag = true;
+                break;
+            case MUL:
+                flag = true;
+                break;
+            case LESS:
+                flag = true;
+                break;
             default:
                 break;
         }

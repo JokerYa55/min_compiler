@@ -7,9 +7,7 @@ package ru.minimal.compiler.main;
 
 import java.io.FileReader;
 import org.apache.log4j.Logger;
-import ru.minimal.compiler.comiler.compiller_c;
 import ru.minimal.compiler.comiler.compiller_exp;
-import ru.minimal.compiler.comiler.lexTree;
 import ru.minimal.compiler.comiler.programStract;
 import ru.minimal.compiler.interfaces.compilerInterface;
 import ru.minimal.compiler.lexer.lexer;
@@ -27,9 +25,6 @@ public class smallc_main {
     static Logger log = Logger.getLogger(smallc_main.class);
 
     public static void main(String[] args) {
-        // TODO code application logic here
-        System.out.println("");
-        // TODO code application logic here
         log.info("------------------------------------------------------------------");
         log.debug("Запуск компиятора");
 
@@ -47,11 +42,6 @@ public class smallc_main {
             run runnable = new run(args[1]);
 
             log.info(runnable.getVariable());
-
-            /*while ((c = fin.read())!=-1)
-            {
-                System.out.println("tep = " + (char) c);
-            }*/
             log.info("------------------------------------------------------------------");
         } catch (Exception e) {
             log.error(e);

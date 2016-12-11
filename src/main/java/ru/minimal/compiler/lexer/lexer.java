@@ -12,6 +12,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.log4j.Logger;
 //import org.apache.log4j.Logger;
 import ru.minimal.compiler.lexer.lexerConst.tokenEnum;
 
@@ -21,7 +22,7 @@ import ru.minimal.compiler.lexer.lexerConst.tokenEnum;
  */
 public class lexer {
 
-    //  static Logger log = Logger.getLogger(lexer.class);
+    static Logger log = Logger.getLogger(lexer.class);
     private Hashtable<String, tokenEnum> symbols = new Hashtable<>();
     private Hashtable<String, tokenEnum> words = new Hashtable<>();
     private Reader fin;
@@ -47,6 +48,7 @@ public class lexer {
         symbols.put("+", tokenEnum.PLUS);
         symbols.put("-", tokenEnum.MINUS);
         symbols.put("<", tokenEnum.LESS);
+        symbols.put("*", tokenEnum.MUL);
 
         // инициализируе слова
         words.put("if", tokenEnum.IF);
@@ -57,16 +59,16 @@ public class lexer {
         // Добавляе паттерны для проверки
         alphaPattern    = Pattern.compile("^[a-zA-Z]$");
         digitPattern    = Pattern.compile("^[0-9]$");
-        operPattern     = Pattern.compile("^=|\\+|\\-|<$");
+        operPattern     = Pattern.compile("^=|\\+|\\-|<|\\*$");
         scobPattern     = Pattern.compile("^\\{|\\}|\\(|\\)$");
         endOperPattern  = Pattern.compile("^;$");
         wordPattern     = Pattern.compile("^if|else|do|while$");
 
         this.currentCh = getChar();
         nextToken();
-        System.out.println("*******************************");
+        log.debug("*******************************");
         for (token tok : tokenList) {
-            System.out.println(tok.getSym() + " : " + tok.getVal());
+            log.debug(tok.getSym() + " : " + tok.getVal());
         }
     }
 
@@ -84,21 +86,21 @@ public class lexer {
                 while (isAlpha(currentCh + "")) {
                     ident = ident + this.currentCh;
                     this.currentCh = getChar();
-                    System.out.println("this.currentCh : " + this.currentCh);
+                    log.debug("this.currentCh : " + this.currentCh);
                 }
                 if (isWord(ident)) {
                     res = new token();
                     res.setSym(tokenEnum.IF);
                     res.setVal(ident);
                     tokenList.add(res);
-                    System.out.println("word : " + ident);
+                    log.debug("word : " + ident);
                     //this.currentCh = getChar();
                 } else {
                     res = new token();
                     res.setSym(tokenEnum.ID);
                     res.setVal(ident);
                     tokenList.add(res);
-                    System.out.println("Alpha : " + res.getSym());
+                    log.debug("Alpha : " + res.getSym());
                     //this.currentCh = getChar();
                 }
 
@@ -112,28 +114,28 @@ public class lexer {
                 res.setSym(tokenEnum.NUM);
                 res.setVal(ident);
                 tokenList.add(res);
-                System.out.println("Digit : " + res.getSym());
+                log.debug("Digit : " + res.getSym());
                 //this.currentCh = getChar();
             } else if (isOper(currentCh + "")) {
                 res = new token();
                 res.setSym(symbols.get(currentCh+""));
                 res.setVal(currentCh+"");
                 tokenList.add(res);
-                System.out.println("Oper : " + res.getSym());
+                log.debug("Oper : " + res.getSym());
                 this.currentCh = getChar();
             } else if (isScob(currentCh + "")) {
                 res = new token();
                 res.setSym(symbols.get(currentCh+""));
                 res.setVal(currentCh+"");
                 tokenList.add(res);
-                System.out.println("Скобка : " + res.getSym());
+                log.debug("Скобка : " + res.getSym());
                 this.currentCh = getChar();
             } else if (isEndOper(currentCh + "")) {
                 res = new token();
                 res.setSym(symbols.get(currentCh+""));
                 res.setVal(currentCh+"");
                 tokenList.add(res);
-                System.out.println("End oper : " + res.getSym());
+                log.debug("End oper : " + res.getSym());
                 this.currentCh = getChar();
             } else {
                 this.currentCh = getChar();
