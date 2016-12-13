@@ -114,8 +114,7 @@ public class run implements processorInterfaces {
                         stack.push(Long.parseLong(operand[1].substring(0, operand[1].length() - 1)));
                         this.CS++;
                     } catch (Exception e) {
-                        // Поучаем значение переменной
-                        log.debug("Переменная");
+                        // Поучаем значение переменной                        
                         // Проверяем есть ли такая переменна в таблице
                         String temp1 = operand[1].substring(0, operand[1].length() - 1);
                         long a = 0;
@@ -125,6 +124,7 @@ public class run implements processorInterfaces {
                             a = 0;
                             varTable.put(temp1, a);
                         }
+                        log.debug("Переменная = " + a);
                         stack.push(a);
                         this.CS++;
                     }

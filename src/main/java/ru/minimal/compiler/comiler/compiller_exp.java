@@ -26,6 +26,7 @@ public class compiller_exp implements compilerInterface {
     private lexTree tree;
     private lexNode currentNode;
     private programBlock currentProgramBlock;
+    private int labelCount = 0;
     private int currentBlockNum = 0;
     // стек для операндв
     private Stack<lexNode> stack = new Stack();
@@ -450,7 +451,7 @@ public class compiller_exp implements compilerInterface {
             // обрабатываем "IF"
             log.debug("Обрабатываем IF");
             getNextNode(parentNode.getlNode(), out);
-            getNextNode(parentNode.getrNode(), out, "label1");
+            getNextNode(parentNode.getrNode(), out, "label" + this.labelCount);
             getNextNode(parentNode.getdNode(), out);
             //log.debug("lt label1;");
             //out.write("lt label1;\n");
@@ -463,7 +464,8 @@ public class compiller_exp implements compilerInterface {
             getNextNode(parentNode.getrNode(), out);
             log.debug("lt;");
             out.write("lt;\n");
-            out.write("jz label1;\n");
+            this.labelCount ++;
+            out.write("jz label" + this.labelCount + ";\n");
         }
 
         if (parentNode.getnToen().getSym() == lexerConst.tokenEnum.ID) {

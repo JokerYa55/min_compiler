@@ -77,7 +77,7 @@ public class lexer {
         res.setSym(null);
         res.setVal(null);
         while (/*(res.getSym() != null) &&*/(this.currentCh != 65535)) {
-            log.debug("ch = " + (int) this.currentCh);
+            //log.debug("ch = " + (int) this.currentCh);
             if (this.currentCh == 0) {
                 res.setSym(tokenEnum.EOF);
                 res.setVal(this.currentCh + "");
