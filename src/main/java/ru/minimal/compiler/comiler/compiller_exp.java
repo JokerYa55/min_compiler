@@ -332,7 +332,7 @@ public class compiller_exp implements compilerInterface {
 
                     case LPAR: {
                         // обрабатываем скобку
-                        log.debug("Обрабатываем скобку");
+                        log.debug("Обрабатываем скобку (");
                         int p = getParEndPost(exp);
                         if (p < len) {
                             // Если выражение типа (exp) <oper> exp
@@ -407,6 +407,8 @@ public class compiller_exp implements compilerInterface {
     private void getNextNode(lexNode parentNode, FileWriter out, String label) throws IOException {
         log.debug("Добавляем метку : " + label);
         getNextNode(parentNode, out);
+        // Добавляем метку конца блока IF        
+        out.write("jmp " + label +";\n");
         out.write(label + ":\n");
     }
 
@@ -450,9 +452,15 @@ public class compiller_exp implements compilerInterface {
         if (parentNode.getnToen().getSym() == lexerConst.tokenEnum.IF) {
             // обрабатываем "IF"
             log.debug("Обрабатываем IF");
+            // Обрабатываем условие
+            log.debug("Обрабатываем условие");
             getNextNode(parentNode.getlNode(), out);
-            getNextNode(parentNode.getrNode(), out, "label" + this.labelCount);
-            getNextNode(parentNode.getdNode(), out);
+            // Обрабатываем ветку TRUE
+            log.debug("Обрабатываем ветку TRUE");
+            getNextNode(parentNode.getrNode(), out, "label_no" + this.labelCount);
+            // Обрабатываем ветку FALSE
+            log.debug("Обрабатываем ветку FALSE");
+            getNextNode(parentNode.getdNode(), out, "label_no" + this.labelCount + "_end");
             //log.debug("lt label1;");
             //out.write("lt label1;\n");
         }
@@ -465,14 +473,14 @@ public class compiller_exp implements compilerInterface {
             log.debug("lt;");
             out.write("lt;\n");
             this.labelCount ++;
-            out.write("jz label" + this.labelCount + ";\n");
+            out.write("jz label_no" + this.labelCount + ";\n");
         }
 
         if (parentNode.getnToen().getSym() == lexerConst.tokenEnum.ID) {
             // обрабатываем ID     
             log.debug("обрабатываем ID");
-            log.debug("push " + parentNode.getnToen().getVal() + ";");
-            out.write("push " + parentNode.getnToen().getVal() + ";\n");
+            log.debug("frtch " + parentNode.getnToen().getVal() + ";");
+            out.write("fetch " + parentNode.getnToen().getVal() + ";\n");
         }
 
         if (parentNode.getnToen().getSym() == lexerConst.tokenEnum.NUM) {

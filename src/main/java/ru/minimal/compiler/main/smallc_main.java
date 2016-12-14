@@ -40,7 +40,6 @@ public class smallc_main {
 
             // Запускаем программу 
             run runnable = new run(args[1]);
-
             log.info(runnable.getVariable());
             log.info("------------------------------------------------------------------");
         } catch (Exception e) {

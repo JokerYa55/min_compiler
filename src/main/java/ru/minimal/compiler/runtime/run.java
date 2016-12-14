@@ -21,13 +21,21 @@ import ru.minimal.compiler.interfaces.processorInterfaces;
 
 /**
  *
- * @author vasl FETCH x - положить на стек значение переменной x STORE x -
- * сохранить в переменной x значение с вершины стека PUSH n - положить число n
- * на вершину стека POP - удалить число с вершины стека ADD - сложить два числа
- * на вершине стека SUB - вычесть два числа на вершине стека LT - сравнить два
- * числа с вершины стека (a < b). Результат - 0 или 1 JZ a - если на вершине
- * стека 0 - перейти к адресу a. JNZ a - если на вершине стека не 0 - перейти к
- * адресу a. JMP a - перейти к адресу a HALT - завершить работу
+ * @author vasl
+ */
+
+/*
+FETCH x - положить на стек значение переменной x 
+STORE x - сохранить в переменной x значение с вершины стека 
+PUSH n - положить число n на вершину стека 
+POP - удалить число с вершины стека 
+ADD - сложить два числа на вершине стека 
+SUB - вычесть два числа на вершине стека 
+LT - сравнить два числа с вершины стека (a < b). Результат - 0 или 1 
+JZ a - если на вершине стека 0 - перейти к адресу a. 
+JNZ a - если на вершине стека не 0 - перейти к адресу a. 
+JMP a - перейти к адресу a 
+HALT - завершить работу
  */
 public class run implements processorInterfaces {
 
@@ -47,6 +55,7 @@ public class run implements processorInterfaces {
     private Pattern lessPattern;
     private Pattern labelPattern;
     private Pattern jzPattern;
+    private Pattern jmpPattern;
     private final String fileName;        // имя исполняемого файла
     // Служебные регистры
     private int CS = 0; //Сегмент кода указывает на текущую команду
@@ -63,13 +72,14 @@ public class run implements processorInterfaces {
             // Читаем команды и загружаем в commandList
 
             while ((temp = fr.readLine()) != null) {
-                i++;
                 log.debug(i + ": temp = " + temp);
                 commandList.add(temp);
                 if (isLabel(temp)) {
                     labelTable.put(temp, i);
                 }
+                i++;
             }
+
         } catch (Exception ex) {
             java.util.logging.Logger.getLogger(run.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -86,8 +96,9 @@ public class run implements processorInterfaces {
         fetchPattern = Pattern.compile("^fetch [0-9a-zA-Z]+;$");
         mulPattern = Pattern.compile("^mul;$");
         lessPattern = Pattern.compile("^lt;$");
-        labelPattern = Pattern.compile("^[a-zA-Z0-9]+:$");
-        jzPattern = Pattern.compile("^jz [a-zA-Z0-9]+;$");
+        labelPattern = Pattern.compile("^[a-zA-Z0-9_]+:$");
+        jzPattern = Pattern.compile("^jz [a-zA-Z0-9_]+;$");
+        jmpPattern = Pattern.compile("^jmp [a-zA-Z0-9_]+;$");
     }
 
     //
@@ -103,6 +114,7 @@ public class run implements processorInterfaces {
             log.debug("runProc()");
             initPattern();
             loadCommand();
+            this.CS=0;
             String temp = "";
             while (this.CS < commandList.size()) {
                 temp = commandList.get(CS);
@@ -110,25 +122,24 @@ public class run implements processorInterfaces {
                 if (isPush(temp)) {
                     log.debug("push");
                     String[] operand = temp.split(" ");
-                    try {
-                        stack.push(Long.parseLong(operand[1].substring(0, operand[1].length() - 1)));
-                        this.CS++;
-                    } catch (Exception e) {
-                        // Поучаем значение переменной                        
-                        // Проверяем есть ли такая переменна в таблице
-                        String temp1 = operand[1].substring(0, operand[1].length() - 1);
-                        long a = 0;
-                        if (varTable.containsKey(temp1)) {
-                            a = varTable.get(temp1);
-                        } else {
-                            a = 0;
-                            varTable.put(temp1, a);
-                        }
-                        log.debug("Переменная = " + a);
-                        stack.push(a);
-                        this.CS++;
+                    stack.push(Long.parseLong(operand[1].substring(0, operand[1].length() - 1)));
+                    this.CS++;
+                } else if (isFetch(temp)) {// Поучаем значение переменной                        
+                    log.debug("fetch");
+                    // Проверяем есть ли такая переменна в таблице                    
+                    String[] operand = temp.split(" ");
+                    String temp1 = operand[1].substring(0, operand[1].length() - 1);
+                    long a = 0;
+                    if (varTable.containsKey(temp1)) {
+                        a = varTable.get(temp1);
+                    } else {
+                        a = 0;
+                        varTable.put(temp1, a);
                     }
-                    //log.info(getStack());
+                    log.debug("Переменная = " + a);
+                    stack.push(a);
+                    log.debug(this.getVarTable().toString());
+                    this.CS++;
                 } else if (isJz(temp)) {
                     Long op1 = stack.pop();
                     //Long op2 = stack.pop();
@@ -142,6 +153,12 @@ public class run implements processorInterfaces {
                     } else {
                         this.CS++;
                     }
+                } else if (isJmp(temp)) {
+                    // Прыгаем на метку
+                    String[] str = temp.split(" ");
+                    String labelTemp = str[1].replace(";", ":");
+                    this.CS = labelTable.get(labelTemp);
+                    log.debug("Переход к команде : " + this.CS + " -> " + commandList.get(CS));
                 } else if (isAdd(temp)) {
                     Long op1 = stack.pop();
                     Long op2 = stack.pop();
@@ -171,10 +188,11 @@ public class run implements processorInterfaces {
                     String[] operand = temp.split(" ");
                     try {
                         varTable.put(operand[1].substring(0, operand[1].length() - 1), new Long(stack.pop()));
-                        this.CS++;
                     } catch (Exception e) {
                         varTable.put(operand[1].substring(0, operand[1].length() - 1), new Long(0));
                     }
+                    log.debug(this.getVarTable().toString());
+                    this.CS++;
                 } else // Обработка команды lt;
                 if (isLt(temp)) {
                     log.debug("lt = " + temp);
@@ -202,6 +220,13 @@ public class run implements processorInterfaces {
     private boolean isJz(String command) {
         boolean res = false;
         Matcher m = this.jzPattern.matcher(command);
+        res = m.matches();
+        return res;
+    }
+
+    private boolean isJmp(String command) {
+        boolean res = false;
+        Matcher m = this.jmpPattern.matcher(command);
         res = m.matches();
         return res;
     }
