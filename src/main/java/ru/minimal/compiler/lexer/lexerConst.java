@@ -12,7 +12,7 @@ package ru.minimal.compiler.lexer;
 public class lexerConst {
 
     public enum tokenEnum {
-        NUM, ID, IF, ELSE, WHILE, DO, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MUL, LESS, EQUAL, SEMICOLON, EOF
+        NUM, ID, IF, ELSE, WHILE, DO, FOR, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MUL, LESS, EQUAL, SEMICOLON, EOF
     };
 
     public enum expTypeEnum {

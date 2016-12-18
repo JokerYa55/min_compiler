@@ -39,8 +39,8 @@ public class smallc_main {
             comp.genASText(args[1]);
 
             // Запускаем программу 
-            run runnable = new run(args[1]);
-            log.info(runnable.getVariable());
+            //run runnable = new run(args[1]);
+            //log.info(runnable.getVariable());
             log.info("------------------------------------------------------------------");
         } catch (Exception e) {
             log.error(e);

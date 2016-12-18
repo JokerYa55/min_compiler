@@ -118,8 +118,42 @@ public class compiller_exp implements compilerInterface {
                             log.debug("Обрабатываем конец нового блока : " + listToken.get(i).getSym());
                             endBlock();
                             i++;
+
+                        } else if (listToken.get(i).getSym() == lexerConst.tokenEnum.FOR) {
+                            // обрабатываем FOR
+                            log.debug("Обрабатываем : " + listToken.get(i).getSym());
+                            exp.clear();
+                            i--;
+                            do {
+                                i++;
+                                exp.add(listToken.get(i));
+                            } while (listToken.get(i).getSym() != lexerConst.tokenEnum.RBRA);
+
+                            lexNode cNode = getExp(exp.subList(0, exp.size()), null);
+                            lexTree lTree = new lexTree(cNode);
+                            this.currentProgramBlock.addOper(lTree);
+                            exp.clear();
+                            i++;
+
+                        } else if (listToken.get(i).getSym() == lexerConst.tokenEnum.WHILE) {
+                            // Обрабатываем операторы WHILE
+                            log.debug("Обрабатываем : " + listToken.get(i).getSym());
+                            exp.clear();
+                            i--;
+                            do {
+                                i++;
+                                exp.add(listToken.get(i));
+                            } while (listToken.get(i).getSym() != lexerConst.tokenEnum.RBRA);
+
+                            lexNode cNode = getExp(exp.subList(0, exp.size()), null);
+                            lexTree lTree = new lexTree(cNode);
+                            this.currentProgramBlock.addOper(lTree);
+                            exp.clear();
+
+                            i++;
+
                         } else if (listToken.get(i).getSym() == lexerConst.tokenEnum.IF) {
-                            // Обрабатываем операторы IF, FOR, WHILE
+                            // Обрабатываем операторы IF
                             log.debug("Обрабатываем : " + listToken.get(i).getSym());
                             // Выделяем весь оператор IF и передаем в getExp
                             exp.clear();
@@ -288,7 +322,7 @@ public class compiller_exp implements compilerInterface {
 
                             }
                             // Выделяем ELSE
-                            i = i+2;
+                            i = i + 2;
                             while (exp.get(i).getSym() != lexerConst.tokenEnum.RBRA) {
                                 cToken = exp.get(i);
                                 if (cToken.getSym() == lexerConst.tokenEnum.RBRA) {
@@ -328,6 +362,123 @@ public class compiller_exp implements compilerInterface {
                         } catch (Exception e) {
                             log.error(e);
                         }
+                    }
+
+                    case FOR: {
+                        // обрабатываем FOR
+                        log.debug("Обрабатываем FOR");
+                        try {
+                            // Создаем узел для FOR
+                            if (parentNode != null) {
+                                localNode.setLevel(parentNode.getLevel() + 1);
+                            } else {
+                                localNode.setLevel(0);
+                            }
+                            localNode.setnToken(exp.get(0));
+                            token cToken;
+                            i++;
+                            // Разделем выражени в скбках на части 1- переменна цикла; 2 - Условие кончание цикла; пераци с переменнй цикла
+
+                            // Выделяем выражение в скбках инициаци переменнй 
+                            while (exp.get(i).getSym() != lexerConst.tokenEnum.SEMICOLON) {
+                                cToken = exp.get(i);
+                                if (cToken.getSym() != lexerConst.tokenEnum.LPAR) {
+                                    lExp.add(cToken);
+                                }
+                                i++;
+                            }
+                            log.debug("lExp = " + lExp);
+                            i++;
+                            // Выделяем выражение услвие цикла 
+                            while (exp.get(i).getSym() != lexerConst.tokenEnum.SEMICOLON) {
+                                cToken = exp.get(i);
+                                if (cToken.getSym() != lexerConst.tokenEnum.LPAR) {
+                                    elseExp.add(cToken);
+                                }
+                                i++;
+                            }
+                            log.debug("elseExp = " + elseExp);
+                            i++;
+                            // Выделяем выражение в скбках изменение переменнй 
+                            while (exp.get(i).getSym() != lexerConst.tokenEnum.SEMICOLON) {
+                                cToken = exp.get(i);
+                                if (cToken.getSym() != lexerConst.tokenEnum.LPAR) {
+                                    rExp.add(cToken);
+                                }
+                                i++;
+                            }
+                            log.debug("rExp = " + rExp);
+                                
+                            rExp.clear();
+                            
+                            i = i + 2;
+                            // Выделяем блок операндов в {}
+                            while (exp.get(i).getSym() != lexerConst.tokenEnum.RBRA) {
+                                cToken = exp.get(i);
+                                if (cToken.getSym() == lexerConst.tokenEnum.RBRA) {
+                                    i++;
+                                    break;
+                                } else if ((cToken.getSym() != lexerConst.tokenEnum.LBRA) && (cToken.getSym() != lexerConst.tokenEnum.RBRA) && (cToken.getSym() != lexerConst.tokenEnum.SEMICOLON)) {
+                                    rExp.add(cToken);
+                                    i++;
+                                } else {
+                                    i++;
+                                }
+                            }
+
+                            localNode.setlNode(getExp(lExp, localNode));
+                            localNode.setdNode(getExp(elseExp, localNode));
+                            localNode.setrNode(getExp(rExp, localNode));
+                        } catch (Exception e) {
+                            log.error(e);
+                        }
+
+                        break;
+                    }
+
+                    case WHILE: {
+                        // обрабатываем WHILE
+                        log.debug("Обрабатываем WHILE");
+                        try {
+                            // Создаем узел для WHILE
+                            if (parentNode != null) {
+                                localNode.setLevel(parentNode.getLevel() + 1);
+                            } else {
+                                localNode.setLevel(0);
+                            }
+                            localNode.setnToken(exp.get(0));
+                            token cToken;
+                            i++;
+                            // Выделяем выражение условия и записываем в левый операнд и записываем в правый блок 
+                            while (exp.get(i).getSym() != lexerConst.tokenEnum.RPAR) {
+                                cToken = exp.get(i);
+                                if (cToken.getSym() != lexerConst.tokenEnum.LPAR) {
+                                    lExp.add(cToken);
+                                }
+                                i++;
+                            }
+                            i++;
+                            // Выделяем блок операндов в {}
+                            while (exp.get(i).getSym() != lexerConst.tokenEnum.RBRA) {
+                                cToken = exp.get(i);
+                                if (cToken.getSym() == lexerConst.tokenEnum.RBRA) {
+                                    i++;
+                                    break;
+                                } else if ((cToken.getSym() != lexerConst.tokenEnum.LBRA) && (cToken.getSym() != lexerConst.tokenEnum.RBRA) && (cToken.getSym() != lexerConst.tokenEnum.SEMICOLON)) {
+                                    rExp.add(cToken);
+                                    i++;
+                                } else {
+                                    i++;
+                                }
+                            }
+
+                            localNode.setlNode(getExp(lExp, localNode));
+                            localNode.setrNode(getExp(rExp, localNode));
+
+                        } catch (Exception e) {
+                            log.error(e);
+                        }
+                        break;
                     }
 
                     case LPAR: {
@@ -408,8 +559,16 @@ public class compiller_exp implements compilerInterface {
         log.debug("Добавляем метку : " + label);
         getNextNode(parentNode, out);
         // Добавляем метку конца блока IF        
-        out.write("jmp " + label +";\n");
+        out.write("jmp " + label + ";\n");
         out.write(label + ":\n");
+    }
+
+    private void getNextNodeWhile(lexNode parentNode, FileWriter out, String label) throws IOException {
+        log.debug("Добавляем метку : " + label);
+        getNextNode(parentNode, out);
+        // Добавляем метку конца блока IF        
+        out.write("jmp " + label + ";\n");
+        //out.write(label + ":\n");
     }
 
     private void getNextNode(lexNode parentNode, FileWriter out) throws IOException {
@@ -449,6 +608,26 @@ public class compiller_exp implements compilerInterface {
             out.write("store " + parentNode.getlNode().getnToen().getVal() + ";\n");
         }
 
+        if (parentNode.getnToen().getSym() == lexerConst.tokenEnum.WHILE) {
+            // обрабатываем WHILE
+            log.debug("Обрабатываем WHILE");
+            // дбавлем метку дл циклла
+            //this.labelCount ++;
+            out.write("loop_" + this.labelCount + ":\n");
+            // брабатываем услвия
+            getNextNode(parentNode.getlNode(), out);
+            // обрабатываем блок перандов
+            getNextNodeWhile(parentNode.getrNode(), out, "loop_" + (this.labelCount - 1));
+            out.write("label_no" + this.labelCount + ":\n");
+        }
+
+        if (parentNode.getnToen().getSym() == lexerConst.tokenEnum.FOR) {
+            // обрабатываем "FOR"
+            log.debug("Обрабатываем FOR");
+            // Обрабатываем условие
+            log.debug("Обрабатываем условие");
+        }
+
         if (parentNode.getnToen().getSym() == lexerConst.tokenEnum.IF) {
             // обрабатываем "IF"
             log.debug("Обрабатываем IF");
@@ -472,7 +651,7 @@ public class compiller_exp implements compilerInterface {
             getNextNode(parentNode.getrNode(), out);
             log.debug("lt;");
             out.write("lt;\n");
-            this.labelCount ++;
+            this.labelCount++;
             out.write("jz label_no" + this.labelCount + ";\n");
         }
 

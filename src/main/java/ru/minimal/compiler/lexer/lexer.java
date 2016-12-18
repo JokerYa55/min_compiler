@@ -55,6 +55,7 @@ public class lexer {
         words.put("else", tokenEnum.ELSE);
         words.put("do", tokenEnum.DO);
         words.put("while", tokenEnum.WHILE);
+        words.put("for", tokenEnum.FOR);
 
         // Добавляе паттерны для проверки
         alphaPattern    = Pattern.compile("^[a-zA-Z]$");
@@ -62,7 +63,7 @@ public class lexer {
         operPattern     = Pattern.compile("^=|\\+|\\-|<|\\*$");
         scobPattern     = Pattern.compile("^\\{|\\}|\\(|\\)$");
         endOperPattern  = Pattern.compile("^;$");
-        wordPattern     = Pattern.compile("^if|else|do|while$");
+        wordPattern     = Pattern.compile("^if|else|do|while|for$");
 
         this.currentCh = getChar();
         nextToken();
