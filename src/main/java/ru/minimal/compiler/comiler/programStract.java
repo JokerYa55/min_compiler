@@ -5,7 +5,8 @@
  */
 package ru.minimal.compiler.comiler;
 
-import ru.minimal.compiler.lexer.lexerConst;
+import org.apache.log4j.Logger;
+import ru.minimal.compiler.interfaces.pNodeInterface;
 
 /**
  *
@@ -13,6 +14,7 @@ import ru.minimal.compiler.lexer.lexerConst;
  */
 public class programStract {
 
+    static Logger log = Logger.getLogger(programStract.class);
     private programBlock pblock;
 
     public programStract() {
@@ -24,21 +26,29 @@ public class programStract {
         return pblock;
     }
 
-    public programBlock newPrograBlock(programBlock parrentBlock, String name)
-    {
-        programBlock res;
-        res = new programBlock(parrentBlock);
-        res.setType(lexerConst.expTypeEnum.BLOCK);
-        res.setBlockName(name);
-        parrentBlock.setpBlock(res);
-        parrentBlock.addOper(res);
+    public programBlock newPrograBlock(programBlock parrentBlock, String name) {
+        programBlock res = null;
+        try {
+            log.debug("newPrograBlock");
+            res = new programBlock(parrentBlock);
+            res.setType(pNodeInterface.pNodeEnum.BLOCK);
+            res.setBlockName(name);
+            if (parrentBlock == null) {
+                res.setLevel(parrentBlock.getLevel() + 1);
+            } else {
+                res.setLevel(parrentBlock.getLevel() + 1);
+            }
+            parrentBlock.setpBlock(res);
+            parrentBlock.addOper(res);
+        } catch (Exception e) {
+            log.error(e);
+        }
         return res;
     }
-    
+
     @Override
     public String toString() {
         return pblock.toString();
     }
-
 
 }

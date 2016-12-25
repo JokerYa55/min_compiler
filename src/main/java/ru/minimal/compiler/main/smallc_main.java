@@ -8,10 +8,9 @@ package ru.minimal.compiler.main;
 import java.io.FileReader;
 import org.apache.log4j.Logger;
 import ru.minimal.compiler.comiler.compiller_exp;
-import ru.minimal.compiler.comiler.programStract;
+import ru.minimal.compiler.comiler.programBlock;
 import ru.minimal.compiler.interfaces.compilerInterface;
 import ru.minimal.compiler.lexer.lexer;
-import ru.minimal.compiler.runtime.run;
 
 /**
  *
@@ -34,17 +33,18 @@ public class smallc_main {
             compilerInterface comp = new compiller_exp();
 
             //compiller_c comp = new compiller_c();
-            programStract tree = comp.genlexTree(lex.getTokenList());
-            System.out.println(tree.toString());
-            comp.genASText(args[1]);
-
+            //programStract tree = comp.genlexTree(lex.getTokenList());
+            //System.out.println(tree.toString());
+            //comp.genASText(args[1]);
             // Запускаем программу 
             //run runnable = new run(args[1]);
             //log.info(runnable.getVariable());
+            programBlock pb = comp.getPB(null, lex.getTokenList().subList(1, lex.getTokenList().size()-1));
+            log.debug(pb.toString());
+
             log.info("------------------------------------------------------------------");
         } catch (Exception e) {
-            log.error(e);
-            System.out.println("Ошибка : " + e.getMessage());
+            log.error(e);           
         }
     }
 

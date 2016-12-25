@@ -5,37 +5,38 @@
  */
 package ru.minimal.compiler.comiler;
 
-import ru.minimal.compiler.interfaces.expInterface;
-import ru.minimal.compiler.lexer.lexerConst;
+import org.apache.log4j.Logger;
 import ru.minimal.compiler.lexer.token;
+import ru.minimal.compiler.interfaces.pNodeInterface;
 
 /**
  *
  * @author vasl
  */
-public class lexTree implements expInterface {
+public class lexTree implements pNodeInterface {
 
+    private static final Logger log = Logger.getLogger(lexTree.class);
     private lexNode rootNode;
-    private lexerConst.expTypeEnum expType;
-
+    private pNodeEnum expType = pNodeEnum.OPER;
+    
     public lexTree(token current) {
         rootNode = new lexNode();
         rootNode.setnToken(current);
         rootNode.setLevel(0);
     }
-
+    
     public lexTree() {
-
+        
     }
-
+    
     public lexTree(lexNode rNode) {
         this.rootNode = rNode;
     }
-
+    
     public lexNode addNode(lexNode parent, token current) {
         lexNode res = new lexNode();
         res.setnToken(current);
-
+        
         if (this.rootNode == null) {
             rootNode = res;
             res.setParrentNode(null);
@@ -53,43 +54,66 @@ public class lexTree implements expInterface {
         //res.setLevel(parent.getLevel()+1);
         return res;
     }
-
-    private String nodeToString(lexNode node, String par) {
+    
+    private String nodeToString(pNodeInterface node, String par) {
         boolean flag = false;
         StringBuilder res = new StringBuilder();
-        res.append(par + "\t-> " + String.format("%" + (node.getnToen().toString().length() + 5 * node.getLevel()) + "s%n", node.getnToen().toString() + " - " + node.getLevel()));
-        if (node.getlNode() != null) {
-            res.append(nodeToString(node.getlNode(), "left"));
+        try {
+            //log.debug("nodeToString => {par = "+ par +"}");
+            if (node.getType() == pNodeEnum.OPER) {
+                lexNode tempNode = (lexNode) node;
+                res.append(par + "\t-> " + String.format("%" + (tempNode.getnToken().toString().length() + 5 * tempNode.getLevel()) + "s%n", tempNode.getnToken().toString() + " - " + tempNode.getLevel()));
+                if (tempNode.getlNode() != null) {
+                    res.append(nodeToString(tempNode.getlNode(), "left"));
+                }
+                
+                if (tempNode.getrNode() != null) {
+                    res.append(nodeToString(tempNode.getrNode(), "right"));
+                }
+                
+                if (tempNode.getdNode() != null) {
+                    res.append(nodeToString(tempNode.getdNode(), "dop"));
+                }
+            } else {
+                programBlock tempPB = (programBlock) node;
+                for (lexTree item : tempPB) {
+                    res.append(nodeToString(item, par));
+                }
+            }
+        } catch (Exception e) {
+            log.error(e);
         }
-
-        if (node.getrNode() != null) {
-            res.append(nodeToString(node.getrNode(), "right"));
-        }
-        
-        if (node.getdNode() != null) {
-            res.append(nodeToString(node.getdNode(), "dop"));
-        }
-        
+        //log.debug(res.toString());
         return res.toString();
     }
-
+    
     @Override
     public String toString() {
         return nodeToString(rootNode, "root");
     }
-
+    
     public lexNode getRootNode() {
         return rootNode;
     }
-
+    
     @Override
-    public lexerConst.expTypeEnum getType() {
+    public pNodeEnum getType() {
         return this.expType;
     }
-
+    
     @Override
-    public void setType(lexerConst.expTypeEnum expType) {
-        this.expType = expType;
+    public void setType(pNodeEnum expType) {
+        this.expType = pNodeEnum.OPER;
     }
-
+    
+    @Override
+    public long getLevel() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public void setLevel(long level) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }

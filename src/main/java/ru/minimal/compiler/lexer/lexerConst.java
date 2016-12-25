@@ -15,10 +15,7 @@ public class lexerConst {
         NUM, ID, IF, ELSE, WHILE, DO, FOR, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MUL, LESS, EQUAL, SEMICOLON, EOF
     };
 
-    public enum expTypeEnum {
-        OPER, BLOCK
-    }
-
+   
     public static boolean isOper(token tok) {
         boolean flag = false;
         switch (tok.getSym()) {

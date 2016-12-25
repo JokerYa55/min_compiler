@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Stack;
 import org.apache.log4j.Logger;
 import ru.minimal.compiler.interfaces.compilerInterface;
-import ru.minimal.compiler.interfaces.expInterface;
 import ru.minimal.compiler.lexer.lexerConst;
 import ru.minimal.compiler.lexer.token;
+import ru.minimal.compiler.interfaces.pNodeInterface;
+import ru.minimal.compiler.interfaces.pNodeInterface.pNodeEnum;
 
 /**
  *
@@ -114,7 +115,7 @@ public class compiller_c implements compilerInterface{
                                     this.currentNode.getlNode().setLevel(this.currentNode.getLevel() + 1);
                                 }
                                 this.currentNode = this.tree.getRootNode();
-                                this.tree.setType(lexerConst.expTypeEnum.OPER);
+                                this.tree.setType(pNodeEnum.OPER);
                                 this.currentProgramBlock.addOper(this.tree);
                                 this.tree = null;
                                 log.debug("stack = " + stack.size());
@@ -241,7 +242,7 @@ public class compiller_c implements compilerInterface{
         if (parentNode.getnToen().getSym() == lexerConst.tokenEnum.NUM) {
             // обрабатываем ID     
             //System.out.println("брабатываем NUM");
-            //      System.out.println("push " + parentNode.getnToen().getVal() + ";");
+            log.debug("push " + parentNode.getnToen().getVal() + ";");
             out.write("push " + parentNode.getnToen().getVal() + ";\n");
         }
 
@@ -267,8 +268,8 @@ public class compiller_c implements compilerInterface{
 
     public void genBlokASMText(programBlock block, FileWriter out) throws IOException {
         log.debug("Обработка блока " + block.getBlockName());
-        for (expInterface item : block.getOperList()) {
-            if (item.getType() == lexerConst.expTypeEnum.OPER) {
+        for (pNodeInterface item : block.getOperList()) {
+            if (item.getType() == pNodeEnum.OPER) {
                 // обрабатываем операцию
                 log.debug("Обрабатывается операция");
                 log.debug(((lexTree) item).toString());
@@ -312,6 +313,11 @@ public class compiller_c implements compilerInterface{
 
     public lexTree getTree() {
         return tree;
+    }
+
+    @Override
+    public programBlock getPB(programBlock parrentBlock, List<token> listToken) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
