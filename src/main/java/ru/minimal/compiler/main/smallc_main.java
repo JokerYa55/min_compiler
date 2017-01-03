@@ -41,6 +41,7 @@ public class smallc_main {
             //log.info(runnable.getVariable());
             programBlock pb = comp.getPB(null, lex.getTokenList().subList(1, lex.getTokenList().size()-1));
             log.debug(pb.toString());
+            comp.genASText(args[1]);
 
             log.info("------------------------------------------------------------------");
         } catch (Exception e) {
