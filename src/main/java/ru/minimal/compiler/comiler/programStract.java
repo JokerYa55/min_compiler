@@ -26,7 +26,7 @@ public class programStract {
         return pblock;
     }
 
-    public programBlock newPrograBlock(programBlock parrentBlock, String name) {
+    public programBlock newProgramBlock(pNodeInterface parrentBlock, String name) {
         programBlock res = null;
         try {
             log.debug("newPrograBlock");
@@ -38,8 +38,8 @@ public class programStract {
             } else {
                 res.setLevel(parrentBlock.getLevel() + 1);
             }
-            parrentBlock.setpBlock(res);
-            parrentBlock.addOper(res);
+            //parrentBlock.setpBlock(res);
+            //parrentBlock.addOper(res);
         } catch (Exception e) {
             log.error(e);
         }

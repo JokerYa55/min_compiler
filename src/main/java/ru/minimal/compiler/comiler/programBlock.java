@@ -19,100 +19,109 @@ import ru.minimal.compiler.interfaces.pNodeInterface;
  * (синтаксических деревьев разбора оператора)
  */
 public class programBlock implements Iterable<lexTree>, pNodeInterface {
-    
+
     private static final Logger log = Logger.getLogger(programBlock.class);
     private List<pNodeInterface> operList;
     //Ссылка на родительский блок
-    private programBlock pBlock;
+    private pNodeInterface pBlock;
     private String blockName;
     private pNodeEnum expType;
     private long level = 0;
-    
+
     public programBlock(programBlock parentBlock) {
         this.pBlock = parentBlock;
         this.operList = new ArrayList<>();
     }
+
+    public programBlock(pNodeInterface parentBlock) {
+        this.pBlock = parentBlock;
+        this.operList = new ArrayList<>();
+    }
+
     
     public boolean addOper(pNodeInterface oper) {
         boolean res = false;
         res = this.operList.add(oper);
         return res;
     }
-    
+
     public List<pNodeInterface> getOperList() {
         return operList;
     }
-    
+
     public String getBlockName() {
         return blockName;
     }
-    
+
     public void setBlockName(String blockName) {
         this.blockName = blockName;
     }
-    
-    @Override
-    public String toString() {
-        String res = null;
+
+    public String nodeToString(pNodeInterface node, String par) {
+        StringBuilder res = new StringBuilder();
         try {
-            res = res + "Блок = " + blockName + "{\n";
-            for (pNodeInterface item : this.operList) {  
+            res.append(par + "Блок = " + blockName + "{\n");
+            for (pNodeInterface item : this.operList) {
                 log.debug("Type = " + item.getType());
-                if (item.getType()==pNodeEnum.OPER)
-                {
-                    log.debug("OPER");
-                    res = res + ((lexTree) item).toString();
-                }
-                else
-                {
-                    log.debug("BLOCK");
+                if (item.getType() == pNodeEnum.OPER) {
+                    log.debug("OPER = ");
+                    //log.debug(item);
+                    res.append((lexTree) item).toString();
+                } else {
+                    log.debug("BLOCK = ");
                     List ps = ((programBlock) item).getOperList();
                     for (Object p : ps) {
                         //log.debug("\t class = " + p.getClass());
-                        //log.debug(((lexTree) p).toString());
-                        res = res + ((lexTree) p).toString();
+                        //log.debug(p);
+                        res.append((lexTree) p).toString();
                     }
-                }                
+                }
             }
         } catch (Exception e) {
             log.error(e);
         }
-        return res + "}\n";
+        return res.toString();
     }
-    
+
+    @Override
+    public String toString() {        
+        return nodeToString(this, "ROOT\n");
+    }
+
     @Override
     public Iterator<lexTree> iterator() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
-    public void forEach(Consumer<? super lexTree> action) {
+    public void forEach(Consumer<? super lexTree> action
+    ) {
         Iterable.super.forEach(action); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    public programBlock getpBlock() {
+
+    public pNodeInterface getpBlock() {
         return pBlock;
     }
-    
-    public void setpBlock(programBlock pBlock) {
+
+    public void setpBlock(pNodeInterface pBlock) {
         this.pBlock = pBlock;
     }
-    
+
     @Override
     public pNodeEnum getType() {
         return this.expType;
     }
-    
+
     @Override
     public void setType(pNodeEnum expType) {
         this.expType = expType;
     }
-    
+
     @Override
     public long getLevel() {
         return this.level;
     }
-    
+
     @Override
     public void setLevel(long level) {
         this.level = level;

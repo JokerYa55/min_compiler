@@ -56,34 +56,38 @@ public class lexTree implements pNodeInterface {
     }
     
     private String nodeToString(pNodeInterface node, String par) {
-        boolean flag = false;
+       // boolean flag = false;
         StringBuilder res = new StringBuilder();
         try {
-            //log.debug("nodeToString => {par = "+ par +"}");
+            //log.debug("nodeToString => {par = "+ par +"}\t=>" + node);
             if (node.getType() == pNodeEnum.OPER) {
                 lexNode tempNode = (lexNode) node;
                 res.append(par + "\t-> " + String.format("%" + (tempNode.getnToken().toString().length() + 5 * tempNode.getLevel()) + "s%n", tempNode.getnToken().toString() + " - " + tempNode.getLevel()));
                 if (tempNode.getlNode() != null) {
+                    //log.debug("Обрабатываем lNode");
                     res.append(nodeToString(tempNode.getlNode(), "left"));
                 }
                 
                 if (tempNode.getrNode() != null) {
+                    //log.debug("Обрабатываем rNode");
                     res.append(nodeToString(tempNode.getrNode(), "right"));
                 }
                 
                 if (tempNode.getdNode() != null) {
+                    //log.debug("Обрабатываем dNode");
                     res.append(nodeToString(tempNode.getdNode(), "dop"));
                 }
             } else {
+                //log.debug("Обрабатываем BLOCK");
                 programBlock tempPB = (programBlock) node;
-                for (lexTree item : tempPB) {
-                    res.append(nodeToString(item, par));
+                for (pNodeInterface item : tempPB.getOperList()) {
+                    res.append(nodeToString(((lexTree)item).rootNode, par));
                 }
             }
         } catch (Exception e) {
             log.error(e);
         }
-        //log.debug(res.toString());
+        //log.debug(res.toString());        
         return res.toString();
     }
     
