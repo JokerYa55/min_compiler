@@ -5,6 +5,7 @@
  */
 package ru.minimal.compiler.comiler;
 
+import com.sun.java.accessibility.util.java.awt.ListTranslator;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import ru.minimal.compiler.interfaces.compilerInterface;
 import ru.minimal.compiler.lexer.lexerConst;
 import ru.minimal.compiler.lexer.token;
 import ru.minimal.compiler.interfaces.pNodeInterface;
+import static ru.minimal.compiler.lexer.lexerConst.isOper;
 
 /**
  *
@@ -153,14 +155,36 @@ public class compiller_exp implements compilerInterface {
                 } else if (listToken.get(i).getSym() == lexerConst.tokenEnum.IF) {
                     // Обрабатываем операторы IF
                     log.debug("Обрабатываем : " + listToken.get(i).getSym());
-                    // Выделяем весь оператор IF и передаем в getExp
+                    // Выделяем весь оператор IF 
+                    log.debug("Выделяем все до ELSE и проверяем баланс скобок");
                     exp.clear();
                     i--;
+
+                    Stack<String> tempStack = new Stack();
+                    tempStack.add("-");
+                    int sc_count = 0; // кол-во скобок
                     do {
                         i++;
                         exp.add(listToken.get(i));
-                    } while (listToken.get(i).getSym() != lexerConst.tokenEnum.RBRA);
+                        if (listToken.get(i).getSym() == lexerConst.tokenEnum.LBRA) {
+                            if (sc_count == 0) {
+                                tempStack.clear();
+                            }
+                            tempStack.add("{");
+                            sc_count++;
+                        }
 
+                        if (listToken.get(i).getSym() == lexerConst.tokenEnum.RBRA) {
+                            tempStack.pop();
+                            sc_count++;
+                        }
+                        //boolean flag = ((!tempStack.isEmpty()));
+                        log.debug(listToken.get(i));
+                        //log.debug(flag);
+                    } while ((!tempStack.isEmpty()));
+
+                    log.debug(exp);
+                    log.debug("Обрабатываем ELSE");
                     i++;
                     if (listToken.get(i).getSym() == lexerConst.tokenEnum.ELSE) {
                         log.debug("Добавляем ELSE");
@@ -191,7 +215,7 @@ public class compiller_exp implements compilerInterface {
                         log.debug("Конец обработки ; \n");
                         exp.clear();
                     }
-                  
+
                     i++;
                 }
             }
@@ -201,125 +225,6 @@ public class compiller_exp implements compilerInterface {
         return res;
     }
 
-    // TODO: Нужно к корню добавить список exp и для каждого оператора делать свое дерево разбора
-    /* public programStract genlexTree(List<token> listToken, programBlock currentBlock) {
-        try {
-            log.debug("genlexTree");
-            if (listToken.size() > 0) {
-                // Проверяем первый символ
-                if (listToken.get(0).getSym() == lexerConst.tokenEnum.LBRA) {
-                    // Создаем основной бллок и структуру программы
-                    this.ps = new programStract();
-                    // Устанавливаем текущий блок
-                    this.currentProgramBlock = ps.getPblock();
-                    blockStack.push(currentProgramBlock);
-                    //              blockStack.push(currentProgramBlock);
-                    // Добавляем "{" в стек
-                    this.stackSc.add("{");
-
-                    tree = null;
-
-                    //tree = new lexTree(listToken.get(0));
-                    //this.currentNode = this.tree.getRootNode();
-                    token currentToken = null;
-                    List<token> exp = new ArrayList<>();
-                    int i = 0;
-                    //for (int i = 1; i < listToken.size(); i++) {
-                    while (i < listToken.size()) {
-                        log.debug("Обрабатываем токен : " + listToken.get(i));
-                        // Обрабатываем новый блок
-                        if (listToken.get(i).getSym() == lexerConst.tokenEnum.LBRA) {
-                            addProgBlock(currentBlock);
-                            i++;
-                        } else if (listToken.get(i).getSym() == lexerConst.tokenEnum.RBRA) {
-                            // обрабатываем конец нового блока
-                            log.debug("Обрабатываем конец нового блока : " + listToken.get(i).getSym());
-                            endBlock();
-                            i++;
-
-                        } //
-                        else if (listToken.get(i).getSym() == lexerConst.tokenEnum.FOR) {
-                            // обрабатываем FOR
-                            log.debug("Обрабатываем : " + listToken.get(i).getSym());
-                            exp.clear();
-                            i--;
-                            do {
-                                i++;
-                                exp.add(listToken.get(i));
-                            } while (listToken.get(i).getSym() != lexerConst.tokenEnum.RBRA);
-
-                            lexNode cNode = (lexNode) getExp(exp.subList(0, exp.size()), null);
-                            lexTree lTree = new lexTree(cNode);
-                            this.currentProgramBlock.addOper(lTree);
-                            exp.clear();
-                            i++;
-
-                        } else if (listToken.get(i).getSym() == lexerConst.tokenEnum.WHILE) {
-                            // Обрабатываем операторы WHILE
-                            log.debug("Обрабатываем : " + listToken.get(i).getSym());
-                            exp.clear();
-                            i--;
-                            do {
-                                i++;
-                                exp.add(listToken.get(i));
-                            } while (listToken.get(i).getSym() != lexerConst.tokenEnum.RBRA);
-
-                            lexNode cNode = (lexNode) getExp(exp.subList(0, exp.size()), null);
-                            lexTree lTree = new lexTree(cNode);
-                            this.currentProgramBlock.addOper(lTree);
-                            exp.clear();
-
-                            i++;
-
-                        } else if (listToken.get(i).getSym() == lexerConst.tokenEnum.IF) {
-                            // Обрабатываем операторы IF
-                            log.debug("Обрабатываем : " + listToken.get(i).getSym());
-                            // Выделяем весь оператор IF и передаем в getExp
-                            exp.clear();
-                            i--;
-                            do {
-                                i++;
-                                exp.add(listToken.get(i));
-                            } while (listToken.get(i).getSym() != lexerConst.tokenEnum.RBRA);
-
-                            i++;
-                            if (listToken.get(i).getSym() == lexerConst.tokenEnum.ELSE) {
-                                log.debug("Добавляем ELSE");
-                                i--;
-                                do {
-                                    i++;
-                                    exp.add(listToken.get(i));
-                                } while (listToken.get(i).getSym() != lexerConst.tokenEnum.RBRA);
-                            }
-
-                            lexNode cNode = (lexNode) getExp(exp.subList(0, exp.size()), null);
-                            lexTree lTree = new lexTree(cNode);
-                            this.currentProgramBlock.addOper(lTree);
-                            exp.clear();
-                        } else {
-                            // Выделяем выражения
-                            // Обрабатываем конец операнда ;
-                            exp.add(listToken.get(i));
-                            if (listToken.get(i).getSym() == lexerConst.tokenEnum.SEMICOLON) {
-                                log.debug("Отрабатываем ;");
-                                lexNode cNode = (lexNode) getExp(exp.subList(0, exp.size() - 1), null);
-                                lexTree lTree = new lexTree(cNode);
-                                this.currentProgramBlock.addOper(lTree);
-                                exp.clear();
-                            }
-                            i++;
-                        }
-                    }
-                }
-            } else {
-                log.error("Ошибка компилции");
-                throw new Exception("Ошибка компилции");
-            }
-        } catch (Exception e) {
-            log.error("Ошибка : " + e.getMessage());
-        }
-        return this.ps;
-    }*/
     // Обрабатываем скобки в выражениях. Возвращает позицию закрывающей скобки для выражения
     private int getParEndPost(List<token> exp) {
         int res = 0;
@@ -341,6 +246,65 @@ public class compiller_exp implements compilerInterface {
         return res;
     }
 
+    // Функция выделения операторов IF WHILE FOR
+    private int getOper(List<token> listToken) {
+        log.debug("getOper = " + listToken);
+        printExp(listToken);
+        int res = 0;
+        if (listToken.get(0).getSym() == lexerConst.tokenEnum.IF) {
+            log.debug("Выделяем оператор IF из потока лексем");
+            Stack<String> tempStack = new Stack();
+            tempStack.add("-");
+            int sc_count = 0; // кол-во скобок
+            
+            List<token> exp = new ArrayList();
+            do {
+                res++;
+                exp.add(listToken.get(res));
+                if (listToken.get(res).getSym() == lexerConst.tokenEnum.LBRA) {
+                    if (sc_count == 0) {
+                        tempStack.clear();
+                    }
+                    tempStack.add("{");
+                    sc_count++;
+                }
+
+                if (listToken.get(res).getSym() == lexerConst.tokenEnum.RBRA) {
+                    tempStack.pop();
+                    sc_count++;
+                }
+                //boolean flag = ((!tempStack.isEmpty()));
+                log.debug(listToken.get(res));
+                //log.debug(flag);
+            } while ((!tempStack.isEmpty()));
+
+            log.debug("Обрабатываем ELSE");
+            res++;
+            if (listToken.get(res).getSym() == lexerConst.tokenEnum.ELSE) {
+                log.debug("Добавляем ELSE");
+                res--;
+                do {
+                    res++;
+                    exp.add(listToken.get(res));
+                } while (listToken.get(res).getSym() != lexerConst.tokenEnum.RBRA);
+            }
+            printExp(exp);
+        }
+        
+        return res;
+    }
+    
+
+    // Печать выражения
+    private void printExp(List<token> exp)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (token item : exp) {
+            sb.append(item.getVal());
+        }
+        log.debug(sb.toString());
+    }
+    
     // Разбирает выражения
     private pNodeInterface getExp(List<token> exp, pNodeInterface parrentNode) {
         //int b;
@@ -426,21 +390,28 @@ public class compiller_exp implements compilerInterface {
                                 i++;
                             }
                             log.debug("\tУсловие IF = " + lExp);
-                            
+
                             // Выделяем блок операндов если условие TRUE//                           
+                            log.debug("\tВыделяем блок операндов если условие TRUE");
                             i++;
-                            stackSc.clear();
+
+                            Stack<String> tempStack = new Stack();
+                            //stackSc.clear();
                             do {
-                                log.debug(exp.get(i).getSym());
-                                if (exp.get(i).getSym() == lexerConst.tokenEnum.LBRA) {
-                                    stackSc.add("{");
+                                log.debug(exp.get(i));
+                                if (exp.get(i).getSym() == lexerConst.tokenEnum.IF) {
+                                    int p = getOper(exp.subList(i, exp.size()));
+                                    rExp.addAll(exp.subList(i, i+p+1));
+                                    i = p;
+                                } else if (exp.get(i).getSym() == lexerConst.tokenEnum.LBRA) {
+                                    tempStack.add("{");
                                 } else if (exp.get(i).getSym() == lexerConst.tokenEnum.RBRA) {
-                                    stackSc.pop();
+                                    tempStack.pop();
                                 } else {
                                     rExp.add(exp.get(i));
                                 }
                                 i++;
-                            } while (stackSc.size() > 0);
+                            } while (tempStack.size() > 0);
                             log.debug("\tБлок TRUE IF = " + rExp);
 
                             log.debug("\tОбработка блока TRUE");
@@ -473,6 +444,7 @@ public class compiller_exp implements compilerInterface {
                             break;
                         } catch (Exception e) {
                             log.error(e);
+                            log.error(exp);
                             break;
                         }
                     }
@@ -668,38 +640,37 @@ public class compiller_exp implements compilerInterface {
         return localNode;
     }
 
-    private void getNextNode(lexNode parentNode, FileWriter out, String label) throws IOException {
+    /* private void getNextNode(lexNode parentNode, FileWriter out, String label) throws IOException {
         log.debug("Добавляем метку : " + label);
         getNextNode(parentNode, out);
         // Добавляем метку конца блока IF        
         out.write("jmp " + label + ";\n");
         out.write(label + ":\n");
-    }
-
-    private void getNextNodeWhile(lexNode parentNode, FileWriter out, String label) throws IOException {
+    }*/
+   /* private void getNextNodeWhile(lexNode parentNode, FileWriter out, String label) throws IOException {
         log.debug("Добавляем метку : " + label);
-        getNextNode(parentNode, out);
+        getNextNode(parentNode, out,);
         // Добавляем метку конца блока IF        
         out.write("jmp " + label + ";\n");
         //out.write(label + ":\n");
-    }
+    }*/
 
-    private void getNextNode(lexNode parentNode, FileWriter out) throws IOException {
+    private void getNextNode(lexNode parentNode, FileWriter out, int label_no) throws IOException {
         // Если операци то выполнем генерим код асм
         log.debug("getNextNode: Если операци то выполнем генерим код асм");
         log.debug("ParentNode = " + parentNode);
         if (parentNode.getnToken().getSym() == lexerConst.tokenEnum.PLUS) {
             log.debug("Обрабатываем +");
-            getNextNode((lexNode) parentNode.getlNode(), out);
-            getNextNode((lexNode) parentNode.getrNode(), out);
+            getNextNode((lexNode) parentNode.getlNode(), out, label_no);
+            getNextNode((lexNode) parentNode.getrNode(), out, label_no);
             log.debug("add;");
             out.write("add;\n");
         }
 
         if (parentNode.getnToken().getSym() == lexerConst.tokenEnum.MINUS) {
             log.debug("Обрабатываем -");
-            getNextNode((lexNode) parentNode.getlNode(), out);
-            getNextNode((lexNode) parentNode.getrNode(), out);
+            getNextNode((lexNode) parentNode.getlNode(), out, label_no);
+            getNextNode((lexNode) parentNode.getrNode(), out, label_no);
             log.debug("sub;");
             out.write("sub;\n");
         }
@@ -707,8 +678,8 @@ public class compiller_exp implements compilerInterface {
         if (parentNode.getnToken().getSym() == lexerConst.tokenEnum.MUL) {
             // обрабатываем "-"
             log.debug("Обрабатываем *");
-            getNextNode((lexNode) parentNode.getlNode(), out);
-            getNextNode((lexNode) parentNode.getrNode(), out);
+            getNextNode((lexNode) parentNode.getlNode(), out, label_no);
+            getNextNode((lexNode) parentNode.getrNode(), out, label_no);
             log.debug("mul;");
             out.write("mul;\n");
         }
@@ -716,7 +687,7 @@ public class compiller_exp implements compilerInterface {
         if (parentNode.getnToken().getSym() == lexerConst.tokenEnum.EQUAL) {
             // обрабатываем "="
             log.debug("брабатываем =");
-            getNextNode((lexNode) parentNode.getrNode(), out);
+            getNextNode((lexNode) parentNode.getrNode(), out, label_no);
             log.debug("store " + ((lexNode) parentNode.getlNode()).getnToken().getVal() + ";");
             out.write("store " + ((lexNode) parentNode.getlNode()).getnToken().getVal() + ";\n");
         }
@@ -728,9 +699,9 @@ public class compiller_exp implements compilerInterface {
             //this.labelCount ++;
             out.write("loop_" + this.labelCount + ":\n");
             // брабатываем услвия
-            getNextNode((lexNode) parentNode.getlNode(), out);
+            getNextNode((lexNode) parentNode.getlNode(), out, label_no);
             // обрабатываем блок перандов
-            getNextNodeWhile((lexNode) parentNode.getrNode(), out, "loop_" + (this.labelCount - 1));
+           // getNextNodeWhile((lexNode) parentNode.getrNode(), out, "loop_" + (this.labelCount - 1));
             out.write("label_no" + this.labelCount + ":\n");
         }
 
@@ -746,41 +717,45 @@ public class compiller_exp implements compilerInterface {
             log.debug("Обрабатываем IF");
             // Обрабатываем условие
             log.debug("Обрабатываем условие");
-            getNextNode((lexNode) parentNode.getlNode(), out);
+            getNextNode((lexNode) parentNode.getlNode(), out, label_no);
             //TODO: Обрабатываем ветку TRUE (Заменить обработку одиночного оператора на обработку блока)
             log.debug("Обрабатываем ветку TRUE");
             if (parentNode.getrNode().getType() == pNodeInterface.pNodeEnum.BLOCK) {
                 List<pNodeInterface> opList = ((programBlock) parentNode.getrNode()).getOperList();
                 for (pNodeInterface item : opList) {
-                    getNextNode(((lexTree) item).getRootNode(), out);
+                    getNextNode(((lexTree) item).getRootNode(), out, label_no+1);
                 }
             } else {
-                getNextNode((lexNode) parentNode.getrNode(), out, "label_no" + this.labelCount);
+                getNextNode((lexNode) parentNode.getrNode(), out, label_no);
             }
             // Обрабатываем ветку FALSE
             log.debug("Обрабатываем ветку FALSE");
+            int p = label_no;
+            out.write("jmp label_no" + p + "_end;\n");
+            out.write("label_no" + p + ":\n");
             if (parentNode.getdNode().getType() == pNodeInterface.pNodeEnum.BLOCK) {
+                log.debug("Обрабатываем блок -> " + ((programBlock) parentNode.getdNode()).getBlockName());
                 List<pNodeInterface> opList = ((programBlock) parentNode.getdNode()).getOperList();
                 for (pNodeInterface item : opList) {
-                    getNextNode(((lexTree) item).getRootNode(), out, "label_no" + this.labelCount + "_end");
+                    getNextNode(((lexTree) item).getRootNode(), out, label_no+1);
                     //getNextNode(((lexTree) item).getRootNode(), out);
                 }
+
             } else {
-                getNextNode((lexNode) parentNode.getdNode(), out, "label_no" + this.labelCount + "_end");
+                getNextNode((lexNode) parentNode.getdNode(), out, label_no);
             }
-            //log.debug("lt label1;");
-            //out.write("lt label1;\n");
+            out.write("label_no" + p + "_end:\n");
         }
 
         if (parentNode.getnToken().getSym() == lexerConst.tokenEnum.LESS) {
             // обрабатываем "IF"
             log.debug("Обрабатываем <");
-            getNextNode((lexNode) parentNode.getlNode(), out);
-            getNextNode((lexNode) parentNode.getrNode(), out);
+            getNextNode((lexNode) parentNode.getlNode(), out, label_no);
+            getNextNode((lexNode) parentNode.getrNode(), out, label_no);
             log.debug("lt;");
             out.write("lt;\n");
             this.labelCount++;
-            out.write("jz label_no" + this.labelCount + ";\n");
+            out.write("jz label_no" + label_no + ";\n");
         }
 
         if (parentNode.getnToken().getSym() == lexerConst.tokenEnum.ID) {
@@ -806,11 +781,11 @@ public class compiller_exp implements compilerInterface {
             log.debug("Обрабатываем {");
 
             if (parentNode.getlNode() != null) {
-                getNextNode((lexNode) parentNode.getlNode(), out);
+                getNextNode((lexNode) parentNode.getlNode(), out, label_no);
             }
 
             if (parentNode.getrNode() != null) {
-                getNextNode((lexNode) parentNode.getrNode(), out);
+                getNextNode((lexNode) parentNode.getrNode(), out, label_no);
                 log.debug("add;");
             }
         }
@@ -825,7 +800,7 @@ public class compiller_exp implements compilerInterface {
                     programBlock pb = (programBlock) item;
                     genBlokASMText(pb, out);
                 } else {
-                    getNextNode(((lexTree) item).getRootNode(), out);
+                    getNextNode(((lexTree) item).getRootNode(), out, 0);
                 }
 
             }
