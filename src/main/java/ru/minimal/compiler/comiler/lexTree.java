@@ -62,7 +62,7 @@ public class lexTree implements pNodeInterface {
             //log.debug("nodeToString => {par = "+ par +"}\t=>" + node);
             if (node.getType() == pNodeEnum.OPER) {
                 lexNode tempNode = (lexNode) node;
-                res.append(par + "\t-> " + String.format("%" + (tempNode.getnToken().toString().length() + 5 * tempNode.getLevel()) + "s%n", tempNode.getnToken().toString() + " - " + tempNode.getLevel()));
+                res.append(par).append("\t-> ").append(String.format("%" + (tempNode.getnToken().toString().length() + 5 * tempNode.getLevel()) + "s%n", tempNode.getnToken().toString() + " - " + tempNode.getLevel()));
                 if (tempNode.getlNode() != null) {
                     //log.debug("Обрабатываем lNode");
                     res.append(nodeToString(tempNode.getlNode(), "left"));
@@ -112,12 +112,12 @@ public class lexTree implements pNodeInterface {
     
     @Override
     public long getLevel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.rootNode.getLevel();
     }
     
     @Override
     public void setLevel(long level) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.rootNode.setLevel(level);
     }
     
 }

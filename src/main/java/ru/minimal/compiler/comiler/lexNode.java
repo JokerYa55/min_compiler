@@ -6,7 +6,6 @@
 package ru.minimal.compiler.comiler;
 
 import org.apache.log4j.Logger;
-import ru.minimal.compiler.lexer.lexerConst;
 import ru.minimal.compiler.lexer.lexerConst.tokenEnum;
 import ru.minimal.compiler.lexer.token;
 import ru.minimal.compiler.interfaces.pNodeInterface;
