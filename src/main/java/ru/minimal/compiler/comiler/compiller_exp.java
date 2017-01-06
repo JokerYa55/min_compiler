@@ -5,7 +5,6 @@
  */
 package ru.minimal.compiler.comiler;
 
-import com.sun.java.accessibility.util.java.awt.ListTranslator;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import ru.minimal.compiler.interfaces.compilerInterface;
 import ru.minimal.compiler.lexer.lexerConst;
 import ru.minimal.compiler.lexer.token;
 import ru.minimal.compiler.interfaces.pNodeInterface;
-import static ru.minimal.compiler.lexer.lexerConst.isOper;
 
 /**
  *
@@ -35,7 +33,7 @@ public class compiller_exp implements compilerInterface {
     // стек для программных бллоков
     private Stack<programBlock> blockStack = new Stack();
     // Стек для скобок
-    private Stack<String> stackSc = new Stack<>();
+    //private Stack<String> stackSc = new Stack<>();
     // Стек для выражений
     private StackExp stackExp = new StackExp();
     /*
@@ -59,7 +57,7 @@ public class compiller_exp implements compilerInterface {
         programBlock res = null;
         try {
             log.debug("Создаем нвый блок");
-            this.stackSc.push("{");
+            //this.stackSc.push("{");
             // Сохранем старый блок в стеке
             //this.blockStack.push(currentProgramBlock);
             this.currentBlockNum++;
@@ -84,7 +82,7 @@ public class compiller_exp implements compilerInterface {
         log.debug("endBlock()");
         try {
             // обрабатываем конец нового блока            
-            this.stackSc.pop();
+            //this.stackSc.pop();
             log.debug("обрабатываем конец текущего блока блока");
             this.currentProgramBlock = blockStack.pop();
         } catch (Exception e) {
@@ -100,6 +98,7 @@ public class compiller_exp implements compilerInterface {
             log.debug("--------------------------------- genPB ---------------------------------");
             log.debug(parrentBlock);
             log.debug("PB=>" + listToken);
+            printExp(listToken);
             //log.debug("parentBlock => " + parrentBlock);
             // Добавляем новый блок
             if (parrentBlock == null) {
@@ -117,6 +116,7 @@ public class compiller_exp implements compilerInterface {
             int i = 0;
             List<token> tempPB = new ArrayList();
             List<token> exp = new ArrayList<>();
+            Stack<String> stackSc = new Stack();
             while (i < listToken.size()) {
                 log.debug("Обрабатываем токен : " + listToken.get(i));
                 if (listToken.get(i).getSym() == lexerConst.tokenEnum.LBRA) {
@@ -159,11 +159,11 @@ public class compiller_exp implements compilerInterface {
                     // Выделяем весь оператор IF 
                     log.debug("Выделяем все до ELSE и проверяем баланс скобок");
                     exp.clear();
-                    i--;
+                    //i--;
 
                     Stack<String> tempStack = new Stack();
                     tempStack.add("-");
-                    int sc_count = 0; // кол-во скобок
+                    /*int sc_count = 0; // кол-во скобок
                     do {
                         i++;
                         exp.add(listToken.get(i));
@@ -183,7 +183,7 @@ public class compiller_exp implements compilerInterface {
                         log.debug(listToken.get(i));
                         //log.debug(flag);
                     } while ((!tempStack.isEmpty()));
-
+                     
                     log.debug(exp);
                     log.debug("Обрабатываем ELSE");
                     i++;
@@ -194,10 +194,14 @@ public class compiller_exp implements compilerInterface {
                             i++;
                             exp.add(listToken.get(i));
                         } while (listToken.get(i).getSym() != lexerConst.tokenEnum.RBRA);
-                    }
+                    }*/
+                    
+                    int p = getOper(listToken.subList(i, listToken.size()));
+                    exp.addAll(listToken.subList(i, i + p + 1));
+                    i = p;
                     i++;
                     log.debug("Обработка оператора IF = " + exp + "\n");
-
+                    printExp(exp);
                     lexNode cNode = (lexNode) getExp(exp.subList(0, exp.size()), res);
                     lexTree lTree = new lexTree(cNode);
                     //this.currentProgramBlock.addOper(lTree);
@@ -256,9 +260,10 @@ public class compiller_exp implements compilerInterface {
             log.debug("Выделяем оператор IF из потока лексем");
             Stack<String> tempStack = new Stack();
             tempStack.add("-");
-            int sc_count = 0; // кол-во скобок
-
+            int sc_count = 0; // кол-во скобок            
             List<token> exp = new ArrayList();
+            log.debug("Выделяем все до ELSE");
+            exp.add(listToken.get(res));
             do {
                 res++;
                 exp.add(listToken.get(res));
@@ -280,6 +285,9 @@ public class compiller_exp implements compilerInterface {
             } while ((!tempStack.isEmpty()));
 
             log.debug("Обрабатываем ELSE");
+            sc_count = 0;
+            tempStack.clear();
+            tempStack.add("-");
             res++;
             if (listToken.get(res).getSym() == lexerConst.tokenEnum.ELSE) {
                 log.debug("Добавляем ELSE");
@@ -287,7 +295,22 @@ public class compiller_exp implements compilerInterface {
                 do {
                     res++;
                     exp.add(listToken.get(res));
-                } while (listToken.get(res).getSym() != lexerConst.tokenEnum.RBRA);
+
+                    if (listToken.get(res).getSym() == lexerConst.tokenEnum.LBRA) {
+                        if (sc_count == 0) {
+                            tempStack.clear();
+                        }
+                        tempStack.add("{");
+                        sc_count++;
+                    }
+
+                    if (listToken.get(res).getSym() == lexerConst.tokenEnum.RBRA) {
+                        tempStack.pop();
+                        sc_count++;
+                    }
+
+                } while ((!tempStack.isEmpty()));
+                //(listToken.get(res).getSym() != lexerConst.tokenEnum.RBRA);
             }
             printExp(exp);
         }
@@ -307,6 +330,7 @@ public class compiller_exp implements compilerInterface {
     // Разбирает выражения
     private pNodeInterface getExp(List<token> exp, pNodeInterface parrentNode) {
         log.debug("getExp => exp = " + exp);
+        printExp(exp);
         if (parrentNode != null) {
             log.debug("Уровень = " + parrentNode.getLevel());
         }
@@ -605,7 +629,7 @@ public class compiller_exp implements compilerInterface {
                             if (lexerConst.isOper(exp.get(i))) {
                                 flag = false;
                                 // Если операция получаем левое и правое выражения и обрабатываем их
-                                log.error("Обработка операции : " + exp.get(i));
+                                log.debug("Обработка операции : " + exp.get(i));
 
                                 // Проверяем на скобки
                                 lExp = exp.subList(0, i);
@@ -730,7 +754,7 @@ public class compiller_exp implements compilerInterface {
             // Обрабатываем ветку FALSE
             log.debug("Обрабатываем ветку FALSE");
             //int p = (int) (label_no + parentNode.getLevel());
-            
+
             String label = label_no + "_" + parentNode.getLevel();
             out.write("jmp label_no" + label + "_end;\n");
             out.write("label_no" + label + ":\n");
@@ -757,7 +781,7 @@ public class compiller_exp implements compilerInterface {
             out.write("lt;\n");
             //this.labelCount++;
             //int p = (int) (label_no + parentNode.getLevel());
-            String label = label_no + "_" + (parentNode.getLevel()-1);
+            String label = label_no + "_" + (parentNode.getLevel() - 1);
             out.write("jz label_no" + label + ";\n");
         }
 

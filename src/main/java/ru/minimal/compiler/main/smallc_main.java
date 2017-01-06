@@ -41,10 +41,10 @@ public class smallc_main {
             
             programBlock pb = comp.getPB(null, lex.getTokenList().subList(1, lex.getTokenList().size()-1));
             log.debug(pb.toString());
-            comp.genASText(args[1]);
+            //comp.genASText(args[1]);
             // Запускаем программу 
-            run runnable = new run(args[1]);
-            log.info(runnable.getVariable());
+            //run runnable = new run(args[1]);
+            //log.info(runnable.getVariable());
             
             log.info("------------------------------------------------------------------");
         } catch (Exception e) {
